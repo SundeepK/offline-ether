@@ -1,0 +1,108 @@
+{
+  "_note1": "KEEP THIS FILE! Check it into a version control system (VCS) like git.",
+  "_note2": "ObjectBox manages crucial IDs for your object model. See docs for details.",
+  "_note3": "If you have VCS merge conflicts, you must resolve them according to ObjectBox docs.",
+  "entities": [
+    {
+      "id": "1:3485436169286739647",
+      "lastPropertyId": "3:8091305792551869513",
+      "name": "EtherAddress",
+      "properties": [
+        {
+          "id": "1:4747869306121141030",
+          "name": "id"
+        },
+        {
+          "id": "2:4299248696981852951",
+          "indexId": "1:976513189475553077",
+          "name": "address"
+        },
+        {
+          "id": "3:8091305792551869513",
+          "name": "balance"
+        }
+      ],
+      "relations": []
+    },
+    {
+      "id": "2:6696083212557257440",
+      "lastPropertyId": "15:2159525859531952889",
+      "name": "EtherTransaction",
+      "properties": [
+        {
+          "id": "1:5210404547117376997",
+          "name": "blockNumber"
+        },
+        {
+          "id": "2:4203805876882621605",
+          "name": "timeStamp"
+        },
+        {
+          "id": "3:662700447705317431",
+          "name": "hash"
+        },
+        {
+          "id": "4:6663748671854617746",
+          "name": "nonce"
+        },
+        {
+          "id": "5:1455872540835818194",
+          "name": "blockHash"
+        },
+        {
+          "id": "6:6630905196185053546",
+          "name": "from"
+        },
+        {
+          "id": "7:976905865708571449",
+          "name": "to"
+        },
+        {
+          "id": "8:92275804285962624",
+          "name": "value"
+        },
+        {
+          "id": "9:2215761702702612532",
+          "name": "gas"
+        },
+        {
+          "id": "10:6781036740385481710",
+          "name": "gasPrice"
+        },
+        {
+          "id": "11:7091080445295293564",
+          "name": "isError"
+        },
+        {
+          "id": "12:5340925979598019425",
+          "name": "cumulativeGasUsed"
+        },
+        {
+          "id": "13:6383699502157683908",
+          "name": "gasUsed"
+        },
+        {
+          "id": "14:1035457753921624718",
+          "name": "confirmations"
+        },
+        {
+          "id": "15:2159525859531952889",
+          "indexId": "2:5033216130226524411",
+          "name": "addressId"
+        }
+      ],
+      "relations": []
+    }
+  ],
+  "lastEntityId": "2:6696083212557257440",
+  "lastIndexId": "2:5033216130226524411",
+  "lastRelationId": "0:0",
+  "lastSequenceId": "0:0",
+  "modelVersion": 4,
+  "modelVersionParserMinimum": 4,
+  "retiredEntityUids": [],
+  "retiredIndexUids": [],
+  "retiredPropertyUids": [],
+  "retiredRelationUids": [],
+  "version": 1
+}
