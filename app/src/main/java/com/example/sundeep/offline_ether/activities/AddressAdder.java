@@ -6,10 +6,19 @@ import android.util.Log;
 
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
+import com.example.sundeep.offline_ether.entities.Balance;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.entities.EtherAddress_;
+import com.example.sundeep.offline_ether.etherscan.EtherScan;
+
+import java.util.Collections;
+import java.util.List;
 
 import io.objectbox.Box;
+import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.schedulers.Schedulers;
+import okhttp3.OkHttpClient;
 
 public class AddressAdder extends AppCompatActivity {
 
@@ -20,31 +29,47 @@ public class AddressAdder extends AppCompatActivity {
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.address_adder);
-
+        String etherScanHost = getResources().getString(R.string.etherScanHost);
+        EtherScan etherScan = new EtherScan(new OkHttpClient(), etherScanHost);
         String address = getIntent().getStringExtra(PUBLIC_ADDRESS);
-        Box<EtherAddress> boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
         Log.d(TAG, "Started with" + address);
 
-        EtherAddress existingAddress = boxStore
-                .query()
-                .equal(EtherAddress_.address, address)
-                .build()
-                .findFirst();
+        Observable<List<Balance>> balance = etherScan.getBalance(Collections.singletonList(address));
+
+        balance.observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .doOnError(e -> Log.e(TAG, "Error fetching balances", e))
+                .subscribe(balances -> saveAddress(balances, address));
+
+    }
+
+    private void saveAddress(List<Balance> balances, String address) {
+        if (balances.isEmpty()) {
+            Log.d(TAG, "No address found in etherscan for " + address);
+            finish();
+        }
+        Box<EtherAddress> boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
+        EtherAddress existingAddress = queryAddress(address, boxStore);
+        EtherAddress newAddress = new EtherAddress(address, balances.get(0).getBalance().toString());
 
         if (existingAddress == null) {
-            EtherAddress newAddress = new EtherAddress();
-            newAddress.setAddress(address);
             boxStore.put(newAddress);
             Log.d(TAG, "Added new address " + newAddress);
             finish();
         } else {
-            existingAddress.setBalance("" + Math.random());
+            existingAddress.setBalance(balances.get(0).getBalance().toString());
             boxStore.put(existingAddress);
             Log.d(TAG, "Address already exists " + existingAddress);
             finish();
         }
+    }
 
-
+    private EtherAddress queryAddress(String address, Box<EtherAddress> boxStore) {
+        return boxStore
+                    .query()
+                    .equal(EtherAddress_.address, address)
+                    .build()
+                    .findFirst();
     }
 
 }

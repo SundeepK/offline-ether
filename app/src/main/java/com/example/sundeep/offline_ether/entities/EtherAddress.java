@@ -14,10 +14,19 @@ public class EtherAddress {
 
     @Index
     String address;
+
     String balance;
 
     @Backlink
     ToMany<EtherTransaction> etherTransactions;
+
+    public EtherAddress(String address, String balance) {
+        this.address = address;
+        this.balance = balance;
+    }
+
+    public EtherAddress() {
+    }
 
     public long getId() {
         return id;
