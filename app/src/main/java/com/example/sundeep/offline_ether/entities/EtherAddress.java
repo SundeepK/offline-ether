@@ -69,4 +69,26 @@ public class EtherAddress {
                 ", etherTransactions=" + etherTransactions +
                 '}';
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EtherAddress that = (EtherAddress) o;
+
+        if (id != that.id) return false;
+        if (address != null ? !address.equals(that.address) : that.address != null) return false;
+        if (balance != null ? !balance.equals(that.balance) : that.balance != null) return false;
+        return etherTransactions != null ? etherTransactions.equals(that.etherTransactions) : that.etherTransactions == null;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (int) (id ^ (id >>> 32));
+        result = 31 * result + (address != null ? address.hashCode() : 0);
+        result = 31 * result + (balance != null ? balance.hashCode() : 0);
+        result = 31 * result + (etherTransactions != null ? etherTransactions.hashCode() : 0);
+        return result;
+    }
 }
