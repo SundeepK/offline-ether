@@ -20,7 +20,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 
-public class AddressAdder extends AppCompatActivity {
+public class AddressAdderActivity extends AppCompatActivity {
 
     private final static String TAG = "AddressAdder";
     public final static String PUBLIC_ADDRESS = "PUBLIC_ADDRESS";

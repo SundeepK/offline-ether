@@ -11,7 +11,7 @@ import com.google.zxing.Result;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
-public class AddressScanner extends AppCompatActivity implements ZXingScannerView.ResultHandler {
+public class AddressScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private static final String TAG = "AddressScanner";
     private ZXingScannerView scannerView;
 
@@ -42,8 +42,8 @@ public class AddressScanner extends AppCompatActivity implements ZXingScannerVie
     public void handleResult(Result rawResult) {
         Log.d(TAG, rawResult.getText());
         scannerView.stopCamera();
-        Intent intent = new Intent(getBaseContext(), AddressAdder.class);
-        intent.putExtra(AddressAdder.PUBLIC_ADDRESS, rawResult.getText());
+        Intent intent = new Intent(getBaseContext(), AddressAdderActivity.class);
+        intent.putExtra(AddressAdderActivity.PUBLIC_ADDRESS, rawResult.getText());
         finish();
         startActivity(intent);
     }
