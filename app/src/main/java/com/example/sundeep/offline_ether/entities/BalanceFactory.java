@@ -12,7 +12,7 @@ import java.util.List;
 
 public class BalanceFactory {
 
-    private final static String TAG = "EtherScan";
+    private final static String TAG = "BalanceFactory";
     private static final String ACCOUNT = "account";
     private static final String BALANCE = "balance";
     private static final String RESULT = "result";

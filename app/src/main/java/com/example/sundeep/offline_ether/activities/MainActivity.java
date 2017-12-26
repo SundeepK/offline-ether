@@ -34,6 +34,8 @@ import io.objectbox.query.Query;
 import io.objectbox.reactive.DataObserver;
 import io.objectbox.reactive.DataSubscription;
 
+import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
+
 public class MainActivity extends AppCompatActivity {
 
     private final static String TAG = "MainActivity";
@@ -57,6 +59,20 @@ public class MainActivity extends AppCompatActivity {
 
         adapter = new AddressAdapter(addressList);
         addressRecyclerView.setAdapter(adapter);
+        addressRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this.getApplicationContext(), addressRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        Intent intent = new Intent(MainActivity.this.getApplicationContext(), AccountActivity.class);
+                        intent.putExtra(PUBLIC_ADDRESS, addressList.get(position).getAddress());
+                        startActivity(intent);
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+                    }
+                })
+        );
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(addressRecyclerView.getContext(),
                 layoutManager.getOrientation());
@@ -84,10 +100,11 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onData(List<EtherAddress> newAddresses) {
                 Log.d(TAG, "Found address on update:" + newAddresses.toString());
+                View noAddressMessage = findViewById(R.id.no_address_message);
                 if (newAddresses.isEmpty()) {
-                    View noAddressMessage = findViewById(R.id.no_address_message);
                     noAddressMessage.setVisibility(View.VISIBLE);
                 } else {
+                    noAddressMessage.setVisibility(View.GONE);
                     updateCurrentAddressList(newAddresses);
                     Log.d(TAG, "addressList:" + addressList);
                     balanceTextView.setText(calculateBalance() + " ETH");

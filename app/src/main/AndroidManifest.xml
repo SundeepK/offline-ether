@@ -14,8 +14,9 @@
         android:supportsRtl="true"
         android:name=".App"
         android:theme="@style/AppTheme">
-        <activity android:label="New Address" android:name=".activities.AddressScanner"/>
-        <activity android:label="New Address" android:name=".activities.AddressAdder"/>
+        <activity android:label="New Address" android:name=".activities.AddressScannerActivity"/>
+        <activity android:label="New Address" android:name=".activities.AddressAdderActivity"/>
+        <activity android:label="Account" android:name=".activities.AccountActivity"/>
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"

@@ -4,14 +4,12 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.sundeep.offline_ether.activities.MainActivity">
+    tools:context="com.example.sundeep.offline_ether.activities.AccountActivity">
 
-    <include layout="@layout/toolbar" />
-
-    <include layout="@layout/content_main" />
+    <include layout="@layout/account_main" />
 
     <android.support.design.widget.FloatingActionButton
-        android:id="@+id/fab"
+        android:id="@+id/new_offline_transaction"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|end"
