@@ -17,6 +17,7 @@
         <activity android:label="New Address" android:name=".activities.AddressScannerActivity"/>
         <activity android:label="New Address" android:name=".activities.AddressAdderActivity"/>
         <activity android:label="Account" android:name=".activities.AccountActivity"/>
+        <activity android:label="Offline" android:name=".activities.OfflineTransactionActivity"/>
         <activity
             android:name=".activities.MainActivity"
             android:label="@string/app_name"

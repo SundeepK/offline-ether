@@ -8,7 +8,7 @@ import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.entities.Balance;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
-import com.example.sundeep.offline_ether.etherscan.EtherScan;
+import com.example.sundeep.offline_ether.api.etherscan.EtherScan;
 import com.example.sundeep.offline_ether.objectbox.AddressRepository;
 
 import java.util.Collections;
