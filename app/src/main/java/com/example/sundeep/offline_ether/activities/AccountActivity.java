@@ -17,7 +17,7 @@ import com.example.sundeep.offline_ether.adapters.TransactionsAdapter;
 import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
-import com.example.sundeep.offline_ether.api.etherscan.EtherScan;
+import com.example.sundeep.offline_ether.api.etherscan.EtherApiScan;
 import com.example.sundeep.offline_ether.objectbox.AddressRepository;
 
 import java.util.List;
@@ -52,7 +52,7 @@ public class AccountActivity extends AppCompatActivity {
         addressRecyclerView.addItemDecoration(dividerItemDecoration);
 
         String etherScanHost = getResources().getString(R.string.etherScanHost);
-        EtherScan etherScan = new EtherScan(new RestClient(new OkHttpClient()), etherScanHost);
+        EtherApiScan etherApiScan = new EtherApiScan(new RestClient(new OkHttpClient()), etherScanHost);
         String address = getIntent().getStringExtra(PUBLIC_ADDRESS);
 
         addressboxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
@@ -63,7 +63,7 @@ public class AccountActivity extends AppCompatActivity {
         adapter = new TransactionsAdapter(etherTransactions);
         addressRecyclerView.setAdapter(adapter);
 
-        etherScan.getTransactions(address, 1)
+        etherApiScan.getTransactions(address, 1)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .doOnError(e -> Log.e(TAG, "Error fetching transactions", e))

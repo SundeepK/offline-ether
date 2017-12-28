@@ -1,6 +1,7 @@
 package com.example.sundeep.offline_ether.api.etherscan;
 
 import com.example.sundeep.offline_ether.api.RestClient;
+import com.example.sundeep.offline_ether.api.ethgasstation.Ethgas;
 import com.example.sundeep.offline_ether.entities.Balance;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
 import com.example.sundeep.offline_ether.entities.EtherTransactionResultsJson;
@@ -17,15 +18,15 @@ import io.reactivex.Observable;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
 
-public class EtherScan {
+public class EtherApiScan {
 
     private final static String TAG = "EtherScan";
-
+    private HttpUrl ethGasApi = HttpUrl.parse("https://ethgasstation.info/json/ethgasAPI.json");
     private RestClient restClient;
     private String apiEndpoint;
     private Moshi moshi;
 
-    public EtherScan(RestClient restClient, String apiEndpoint) {
+    public EtherApiScan(RestClient restClient, String apiEndpoint) {
         this.restClient = restClient;
         this.apiEndpoint = apiEndpoint;
         this.moshi = new Moshi.Builder().add(new EtherTransaction.EtherTransactionAdapter()).build();
@@ -54,6 +55,14 @@ public class EtherScan {
             Request transactionReq = getNonceRequest(address);
             JsonAdapter<Nonce> jsonAdapter = moshi.adapter(Nonce.class);
             return restClient.executeGet(transactionReq, jsonAdapter);
+        });
+    }
+
+    public Observable<Ethgas> getEthgas(){
+        return Observable.fromCallable(() -> {
+            Request req = new Request.Builder().url(ethGasApi).build();
+            JsonAdapter<Ethgas> jsonAdapter = moshi.adapter(Ethgas.class);
+            return restClient.executeGet(req, jsonAdapter);
         });
     }
 
