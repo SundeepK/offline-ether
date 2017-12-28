@@ -105,30 +105,14 @@ public class MainActivity extends AppCompatActivity {
                     noAddressMessage.setVisibility(View.VISIBLE);
                 } else {
                     noAddressMessage.setVisibility(View.GONE);
-                    updateCurrentAddressList(newAddresses);
+                    addressList.clear();
+                    addressList.addAll(newAddresses);
                     Log.d(TAG, "addressList:" + addressList);
                     balanceTextView.setText(calculateBalance() + " ETH");
                     adapter.notifyDataSetChanged();
                 }
             }
         };
-    }
-
-    private void updateCurrentAddressList(List<EtherAddress> newAddresses) {
-        for (EtherAddress newAddress: newAddresses) {
-            EtherAddress existingAddress = null;
-            for (EtherAddress add: addressList) {
-                if (add.getAddress().equals(newAddress.getAddress())) {
-                    existingAddress = add;
-                    break;
-                }
-            }
-            if (existingAddress == null) {
-                addressList.add(newAddress);
-            } else {
-                existingAddress.setBalance(newAddress.getBalance());
-            }
-        }
     }
 
     private String calculateBalance() {

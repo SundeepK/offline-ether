@@ -63,8 +63,10 @@ public class AddressAdderActivity extends AppCompatActivity {
             Log.d(TAG, "Added new address " + newAddress);
             finish();
         } else {
-            existingAddress.setBalance(balances.get(0).getBalance().toString());
-            addressRepository.put(existingAddress);
+            EtherAddress addressToSave = EtherAddress.newBuilder(existingAddress)
+                    .setBalance(balances.get(0).getBalance().toString())
+                    .build();
+            addressRepository.put(addressToSave);
             Log.d(TAG, "Address already exists " + existingAddress);
             finish();
         }

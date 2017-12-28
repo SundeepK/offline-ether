@@ -28,36 +28,40 @@ public class EtherAddress {
     public EtherAddress() {
     }
 
-    public long getId() {
-        return id;
+    private EtherAddress(Builder builder) {
+        id = builder.id;
+        address = builder.address;
+        balance = builder.balance;
+        etherTransactions = builder.etherTransactions;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public static Builder newBuilder() {
+        return new Builder();
+    }
+
+    public static Builder newBuilder(EtherAddress copy) {
+        Builder builder = new Builder();
+        builder.id = copy.getId();
+        builder.address = copy.getAddress();
+        builder.balance = copy.getBalance();
+        builder.etherTransactions = copy.getEtherTransactions();
+        return builder;
+    }
+
+    public long getId() {
+        return id;
     }
 
     public String getBalance() {
         return balance;
     }
 
-    public void setBalance(String balance) {
-        this.balance = balance;
-    }
-
     public ToMany<EtherTransaction> getEtherTransactions() {
         return etherTransactions;
     }
 
-    public void setEtherTransactions(ToMany<EtherTransaction> etherTransactions) {
-        this.etherTransactions = etherTransactions;
-    }
-
     public String getAddress() {
         return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
     }
 
     @Override
@@ -90,5 +94,39 @@ public class EtherAddress {
         result = 31 * result + (balance != null ? balance.hashCode() : 0);
         result = 31 * result + (etherTransactions != null ? etherTransactions.hashCode() : 0);
         return result;
+    }
+
+    public static final class Builder {
+        private long id;
+        private String address;
+        private String balance;
+        private ToMany<EtherTransaction> etherTransactions;
+
+        private Builder() {
+        }
+
+        public Builder setId(long val) {
+            id = val;
+            return this;
+        }
+
+        public Builder setAddress(String val) {
+            address = val;
+            return this;
+        }
+
+        public Builder setBalance(String val) {
+            balance = val;
+            return this;
+        }
+
+        public Builder setEtherTransactions(ToMany<EtherTransaction> val) {
+            etherTransactions = val;
+            return this;
+        }
+
+        public EtherAddress build() {
+            return new EtherAddress(this);
+        }
     }
 }
