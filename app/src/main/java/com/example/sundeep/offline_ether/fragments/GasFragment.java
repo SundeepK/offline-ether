@@ -29,14 +29,13 @@ public class GasFragment extends Fragment {
         gas.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
-                realGas = 60000000000;
+                realGas = 0;
                 realGas = (i - 8);
                 if (i < 10)
                     realGas = (double) (i + 1) / 10d;
 
                 gasText.setText((realGas + "").replaceAll(".0", ""));
                 curTxCost = (new BigDecimal(gasLimit).multiply(new BigDecimal(realGas + ""))).divide(new BigDecimal("1000000000"), 6, BigDecimal.ROUND_DOWN);
-                updateDisplays();
             }
 
             @Override
@@ -47,7 +46,7 @@ public class GasFragment extends Fragment {
             public void onStopTrackingTouch(SeekBar seekBar) {
             }
         });
-        gas.setProgress(DEFAULT_GAS_PRICE);
+        gas.setProgress(0);
 
         return rootView;
     }

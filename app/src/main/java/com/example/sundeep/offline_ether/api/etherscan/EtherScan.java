@@ -2,15 +2,15 @@ package com.example.sundeep.offline_ether.api.etherscan;
 
 import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.entities.Balance;
-import com.example.sundeep.offline_ether.entities.BalanceFactory;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
+import com.example.sundeep.offline_ether.entities.EtherTransactionResultsJson;
 import com.example.sundeep.offline_ether.entities.Nonce;
-import com.example.sundeep.offline_ether.entities.NonceFactory;
-import com.example.sundeep.offline_ether.entities.TransactionFactory;
 import com.google.common.base.Joiner;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
+import com.squareup.moshi.Types;
 
-import org.json.JSONObject;
-
+import java.lang.reflect.Type;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -23,33 +23,37 @@ public class EtherScan {
 
     private RestClient restClient;
     private String apiEndpoint;
+    private Moshi moshi;
 
     public EtherScan(RestClient restClient, String apiEndpoint) {
         this.restClient = restClient;
         this.apiEndpoint = apiEndpoint;
+        this.moshi = new Moshi.Builder().add(new EtherTransaction.EtherTransactionAdapter()).build();
     }
 
     public Observable<List<Balance>> getBalance(List<String> addresses){
         return Observable.fromCallable(() -> {
             Request balanceReq = getBalanceRequest(addresses);
-            JSONObject jObject = restClient.executeGet(balanceReq,);
-            return BalanceFactory.(jObject);
+            Type type = Types.newParameterizedType(List.class, Balance.class);
+            JsonAdapter<List<Balance>> adapter = moshi.adapter(type);
+            return restClient.executeGet(balanceReq, adapter);
         });
     }
 
     public Observable<List<EtherTransaction>> getTransactions(String address, int page){
         return Observable.fromCallable(() -> {
             Request transactionReq = getTransactionRequest(address, page);
-            JSONObject jObject = restClient.executeGet(transactionReq, "transactions");
-            return TransactionFactory.getTransactions(jObject);
+            JsonAdapter<EtherTransactionResultsJson> jsonAdapter = moshi.adapter(EtherTransactionResultsJson.class);
+            EtherTransactionResultsJson o = restClient.executeGet(transactionReq, jsonAdapter);
+            return o.getResults();
         });
     }
 
     public Observable<Nonce> getNonce(String address){
         return Observable.fromCallable(() -> {
             Request transactionReq = getNonceRequest(address);
-            JSONObject jObject = restClient.executeGet(transactionReq, "Nonce");
-            return NonceFactory.getNonce(jObject);
+            JsonAdapter<Nonce> jsonAdapter = moshi.adapter(Nonce.class);
+            return restClient.executeGet(transactionReq, jsonAdapter);
         });
     }
 

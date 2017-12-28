@@ -1,5 +1,8 @@
 package com.example.sundeep.offline_ether.entities;
 
+import com.squareup.moshi.FromJson;
+import com.squareup.moshi.ToJson;
+
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
 import io.objectbox.relation.ToOne;
@@ -9,11 +12,8 @@ public class EtherTransaction {
 
     @Id
     long id;
-
     String blockNumber;
-
     public ToOne<EtherAddress> address;
-
     long timeStamp;
     String hash;
     int nonce;
@@ -92,6 +92,40 @@ public class EtherTransaction {
         builder.confirmations = copy.getConfirmations();
         return builder;
     }
+
+    public static Builder newBuilder(EtherTransactionJson copy) {
+        Builder builder = new Builder();
+        builder.blockNumber = copy.getBlockNumber();
+        builder.timeStamp = copy.getTimeStamp();
+        builder.hash = copy.getHash();
+        builder.nonce = copy.getNonce();
+        builder.blockHash = copy.getBlockHash();
+        builder.from = copy.getFrom();
+        builder.to = copy.getTo();
+        builder.value = copy.getValue();
+        builder.gas = copy.getGas();
+        builder.gasPrice = copy.getGasPrice();
+        builder.isError = copy.getIsError();
+        builder.cumulativeGasUsed = copy.getCumulativeGasUsed();
+        builder.gasUsed = copy.getGasUsed();
+        builder.confirmations = copy.getConfirmations();
+        return builder;
+    }
+
+
+    public static final class EtherTransactionAdapter {
+        @FromJson
+        EtherTransaction eventFromJson(EtherTransactionJson eventJson) {
+            return EtherTransaction.newBuilder(eventJson)
+                    .build();
+        }
+
+        @ToJson
+        EtherTransactionJson eventToJson(EtherTransaction event) {
+            return null;
+        }
+    }
+
 
     @Override
     public String toString() {

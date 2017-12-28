@@ -6,6 +6,7 @@ import android.util.Log;
 
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
+import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.entities.Balance;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.api.etherscan.EtherScan;
@@ -33,7 +34,7 @@ public class AddressAdderActivity extends AppCompatActivity {
         super.onCreate(state);
         setContentView(R.layout.address_adder);
         String etherScanHost = getResources().getString(R.string.etherScanHost);
-        EtherScan etherScan = new EtherScan(new OkHttpClient(), etherScanHost);
+        EtherScan etherScan = new EtherScan(new RestClient(new OkHttpClient()), etherScanHost);
         String address = getIntent().getStringExtra(PUBLIC_ADDRESS);
         Log.d(TAG, "Started with" + address);
 

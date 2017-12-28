@@ -14,6 +14,7 @@ import android.widget.TextView;
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.adapters.TransactionsAdapter;
+import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
 import com.example.sundeep.offline_ether.api.etherscan.EtherScan;
@@ -51,7 +52,7 @@ public class AccountActivity extends AppCompatActivity {
         addressRecyclerView.addItemDecoration(dividerItemDecoration);
 
         String etherScanHost = getResources().getString(R.string.etherScanHost);
-        EtherScan etherScan = new EtherScan(new OkHttpClient(), etherScanHost);
+        EtherScan etherScan = new EtherScan(new RestClient(new OkHttpClient()), etherScanHost);
         String address = getIntent().getStringExtra(PUBLIC_ADDRESS);
 
         addressboxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);

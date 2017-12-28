@@ -1,9 +1,7 @@
 package com.example.sundeep.offline_ether.api;
 
-import org.json.JSONObject;
+public interface ResponseValidator<T> {
 
-public interface ResponseValidator {
-
-    public boolean validate(JSONObject jObject);
+    public boolean validate(T object);
 
 }
