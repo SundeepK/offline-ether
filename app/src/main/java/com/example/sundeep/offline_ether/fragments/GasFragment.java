@@ -65,11 +65,12 @@ public class GasFragment extends Fragment {
                         if (selected >= 0) {
                             GasPrice gasPrice = gasPrices.get(selected);
                             gasPrices.set(selected, GasPrice.newBuilder(gasPrice).setIsSelected(false).build());
+                            adapter.notifyItemChanged(selected);
                         }
                         selected = position;
                         GasPrice gasPrice = gasPrices.get(selected);
                         gasPrices.set(selected, GasPrice.newBuilder(gasPrice).setIsSelected(true).build());
-                        adapter.notifyDataSetChanged();
+                        adapter.notifyItemChanged(selected);
                     }
 
                     @Override
