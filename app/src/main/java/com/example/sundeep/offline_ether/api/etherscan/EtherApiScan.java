@@ -1,8 +1,8 @@
 package com.example.sundeep.offline_ether.api.etherscan;
 
 import com.example.sundeep.offline_ether.api.RestClient;
-import com.example.sundeep.offline_ether.api.ethgasstation.Ethgas;
 import com.example.sundeep.offline_ether.entities.Balance;
+import com.example.sundeep.offline_ether.entities.EthGas;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
 import com.example.sundeep.offline_ether.entities.EtherTransactionResultsJson;
 import com.example.sundeep.offline_ether.entities.Nonce;
@@ -20,7 +20,7 @@ import okhttp3.Request;
 
 public class EtherApiScan {
 
-    private final static String TAG = "EtherScan";
+    private final static String TAG = "EtherApiScan";
     private HttpUrl ethGasApi = HttpUrl.parse("https://ethgasstation.info/json/ethgasAPI.json");
     private RestClient restClient;
     private String apiEndpoint;
@@ -58,10 +58,10 @@ public class EtherApiScan {
         });
     }
 
-    public Observable<Ethgas> getEthgas(){
+    public Observable<EthGas> getEthgas(){
         return Observable.fromCallable(() -> {
             Request req = new Request.Builder().url(ethGasApi).build();
-            JsonAdapter<Ethgas> jsonAdapter = moshi.adapter(Ethgas.class);
+            JsonAdapter<EthGas> jsonAdapter = moshi.adapter(EthGas.class);
             return restClient.executeGet(req, jsonAdapter);
         });
     }

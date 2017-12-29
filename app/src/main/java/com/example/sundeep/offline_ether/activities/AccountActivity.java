@@ -75,7 +75,8 @@ public class AccountActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(AccountActivity.this, OfflineTransactionActivity.class);
-                startActivity(intent);;
+                intent.putExtra(PUBLIC_ADDRESS, address);
+                startActivity(intent);
             }
         });
     }

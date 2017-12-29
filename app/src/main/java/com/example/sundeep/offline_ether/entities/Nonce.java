@@ -1,12 +1,10 @@
 package com.example.sundeep.offline_ether.entities;
 
-import java.math.BigInteger;
-
 public class Nonce {
 
-    private BigInteger nonce;
+    private String nonce;
 
-    public Nonce(BigInteger nonce) {
+    public Nonce(String nonce) {
         this.nonce = nonce;
     }
 
@@ -32,7 +30,7 @@ public class Nonce {
                 '}';
     }
 
-    public BigInteger getNonce() {
+    public String getNonce() {
         return nonce;
     }
 }

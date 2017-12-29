@@ -2,17 +2,17 @@ package com.example.sundeep.offline_ether.entities;
 
 public class EthGas {
 
-    private int fastestWait;
-    private int fast;
-    private int block_time;
-    private int average;
-    private int safeLowWait;
-    private int fastest;
-    private int avgWait;
-    private int blockNum;
-    private int speed;
-    private int fastWait;
-    private int safeLow;
+    private float fastestWait;
+    private float fast;
+    private float block_time;
+    private float average;
+    private float safeLowWait;
+    private float fastest;
+    private float avgWait;
+    private float blockNum;
+    private float speed;
+    private float fastWait;
+    private float safeLow;
 
     private EthGas(Builder builder) {
         fastestWait = builder.fastestWait;
@@ -48,85 +48,50 @@ public class EthGas {
         return builder;
     }
 
-    public int getFastestWait() {
+    public float getFastestWait() {
         return fastestWait;
     }
 
-    public int getFast() {
+    public float getFast() {
         return fast;
     }
 
-    public int getBlock_time() {
+    public float getBlock_time() {
         return block_time;
     }
 
-    public int getAverage() {
+    public float getAverage() {
         return average;
     }
 
-    public int getSafeLowWait() {
+    public float getSafeLowWait() {
         return safeLowWait;
     }
 
-    public int getFastest() {
+    public float getFastest() {
         return fastest;
     }
 
-    public int getAvgWait() {
+    public float getAvgWait() {
         return avgWait;
     }
 
-    public int getBlockNum() {
+    public float getBlockNum() {
         return blockNum;
     }
 
-    public int getSpeed() {
+    public float getSpeed() {
         return speed;
     }
 
-    public int getFastWait() {
+    public float getFastWait() {
         return fastWait;
     }
 
-    public int getSafeLow() {
+    public float getSafeLow() {
         return safeLow;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-
-        EthGas ethGas = (EthGas) o;
-
-        if (fastestWait != ethGas.fastestWait) return false;
-        if (fast != ethGas.fast) return false;
-        if (block_time != ethGas.block_time) return false;
-        if (average != ethGas.average) return false;
-        if (safeLowWait != ethGas.safeLowWait) return false;
-        if (fastest != ethGas.fastest) return false;
-        if (avgWait != ethGas.avgWait) return false;
-        if (blockNum != ethGas.blockNum) return false;
-        if (speed != ethGas.speed) return false;
-        if (fastWait != ethGas.fastWait) return false;
-        return safeLow == ethGas.safeLow;
-    }
-
-    @Override
-    public int hashCode() {
-        int result = fastestWait;
-        result = 31 * result + fast;
-        result = 31 * result + block_time;
-        result = 31 * result + average;
-        result = 31 * result + safeLowWait;
-        result = 31 * result + fastest;
-        result = 31 * result + avgWait;
-        result = 31 * result + blockNum;
-        result = 31 * result + speed;
-        result = 31 * result + fastWait;
-        result = 31 * result + safeLow;
-        return result;
-    }
 
     @Override
     public String toString() {
@@ -145,73 +110,109 @@ public class EthGas {
                 '}';
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        EthGas ethGas = (EthGas) o;
+
+        if (Float.compare(ethGas.fastestWait, fastestWait) != 0) return false;
+        if (Float.compare(ethGas.fast, fast) != 0) return false;
+        if (Float.compare(ethGas.block_time, block_time) != 0) return false;
+        if (Float.compare(ethGas.average, average) != 0) return false;
+        if (Float.compare(ethGas.safeLowWait, safeLowWait) != 0) return false;
+        if (Float.compare(ethGas.fastest, fastest) != 0) return false;
+        if (Float.compare(ethGas.avgWait, avgWait) != 0) return false;
+        if (Float.compare(ethGas.blockNum, blockNum) != 0) return false;
+        if (Float.compare(ethGas.speed, speed) != 0) return false;
+        if (Float.compare(ethGas.fastWait, fastWait) != 0) return false;
+        return Float.compare(ethGas.safeLow, safeLow) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = (fastestWait != +0.0f ? Float.floatToIntBits(fastestWait) : 0);
+        result = 31 * result + (fast != +0.0f ? Float.floatToIntBits(fast) : 0);
+        result = 31 * result + (block_time != +0.0f ? Float.floatToIntBits(block_time) : 0);
+        result = 31 * result + (average != +0.0f ? Float.floatToIntBits(average) : 0);
+        result = 31 * result + (safeLowWait != +0.0f ? Float.floatToIntBits(safeLowWait) : 0);
+        result = 31 * result + (fastest != +0.0f ? Float.floatToIntBits(fastest) : 0);
+        result = 31 * result + (avgWait != +0.0f ? Float.floatToIntBits(avgWait) : 0);
+        result = 31 * result + (blockNum != +0.0f ? Float.floatToIntBits(blockNum) : 0);
+        result = 31 * result + (speed != +0.0f ? Float.floatToIntBits(speed) : 0);
+        result = 31 * result + (fastWait != +0.0f ? Float.floatToIntBits(fastWait) : 0);
+        result = 31 * result + (safeLow != +0.0f ? Float.floatToIntBits(safeLow) : 0);
+        return result;
+    }
+
     public static final class Builder {
-        private int fastestWait;
-        private int fast;
-        private int block_time;
-        private int average;
-        private int safeLowWait;
-        private int fastest;
-        private int avgWait;
-        private int blockNum;
-        private int speed;
-        private int fastWait;
-        private int safeLow;
+        private float fastestWait;
+        private float fast;
+        private float block_time;
+        private float average;
+        private float safeLowWait;
+        private float fastest;
+        private float avgWait;
+        private float blockNum;
+        private float speed;
+        private float fastWait;
+        private float safeLow;
 
         private Builder() {
         }
 
-        public Builder setFastestWait(int val) {
+        public Builder setFastestWait(float val) {
             fastestWait = val;
             return this;
         }
 
-        public Builder setFast(int val) {
+        public Builder setFast(float val) {
             fast = val;
             return this;
         }
 
-        public Builder setBlock_time(int val) {
+        public Builder setBlock_time(float val) {
             block_time = val;
             return this;
         }
 
-        public Builder setAverage(int val) {
+        public Builder setAverage(float val) {
             average = val;
             return this;
         }
 
-        public Builder setSafeLowWait(int val) {
+        public Builder setSafeLowWait(float val) {
             safeLowWait = val;
             return this;
         }
 
-        public Builder setFastest(int val) {
+        public Builder setFastest(float val) {
             fastest = val;
             return this;
         }
 
-        public Builder setAvgWait(int val) {
+        public Builder setAvgWait(float val) {
             avgWait = val;
             return this;
         }
 
-        public Builder setBlockNum(int val) {
+        public Builder setBlockNum(float val) {
             blockNum = val;
             return this;
         }
 
-        public Builder setSpeed(int val) {
+        public Builder setSpeed(float val) {
             speed = val;
             return this;
         }
 
-        public Builder setFastWait(int val) {
+        public Builder setFastWait(float val) {
             fastWait = val;
             return this;
         }
 
-        public Builder setSafeLow(int val) {
+        public Builder setSafeLow(float val) {
             safeLow = val;
             return this;
         }

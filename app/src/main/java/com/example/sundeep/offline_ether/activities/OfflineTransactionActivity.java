@@ -12,6 +12,8 @@ import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.R;
 
+import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
+
 public class OfflineTransactionActivity extends AppCompatActivity {
 
     private ViewPager viewPager;
@@ -26,6 +28,7 @@ public class OfflineTransactionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         setContentView(R.layout.offline_transaction);
+        String address = getIntent().getStringExtra(PUBLIC_ADDRESS);
 
         viewPager = findViewById(R.id.view_pager);
         dotsLayout = findViewById(R.id.layoutDots);
@@ -38,7 +41,7 @@ public class OfflineTransactionActivity extends AppCompatActivity {
         addBottomDots(0);
 
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener);
-        offlineFlowFragmentAdapter = new OfflineFlowFragmentAdapter(getSupportFragmentManager());
+        offlineFlowFragmentAdapter = new OfflineFlowFragmentAdapter(getSupportFragmentManager(), address);
         viewPager.setAdapter(offlineFlowFragmentAdapter);
 
         btnSkip.setOnClickListener(new View.OnClickListener() {
