@@ -3,21 +3,27 @@ package com.example.sundeep.offline_ether.fragments;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.SeekBar;
-import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.R;
+import com.example.sundeep.offline_ether.activities.RecyclerItemClickListener;
+import com.example.sundeep.offline_ether.adapters.GasPricesAdapter;
 import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.api.etherscan.EtherApiScan;
 import com.example.sundeep.offline_ether.entities.EthGas;
 import com.example.sundeep.offline_ether.entities.EthGasAndNonce;
+import com.example.sundeep.offline_ether.entities.GasPrice;
 import com.example.sundeep.offline_ether.entities.Nonce;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -33,41 +39,50 @@ public class GasFragment extends Fragment {
     private double realGas;
     private BigDecimal curTxCost = new BigDecimal("0.000252");
     private String gasLimit = "21000";
-    private SeekBar gasSeekBar;
-    TextView slowGasText;
-    TextView avgGasText;
-    TextView fastGasText;
+    private List<GasPrice> gasPrices = new ArrayList<>();
+    private GasPricesAdapter adapter;
+    private int selected = -1;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
 
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.step_one_offline_transaction, container, false);
-        gasSeekBar = rootView.findViewById(R.id.gas_seekbar);
-        TextView gasText = rootView.findViewById(R.id.gas_textview);
-        TextView gasCostText = rootView.findViewById(R.id.gas_cost_textview);
-        slowGasText = rootView.findViewById(R.id.slow_gas);
-        avgGasText = rootView.findViewById(R.id.avg_gas);
-        fastGasText = rootView.findViewById(R.id.fast_gas);
-        gasSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int gasInGwei, boolean b) {
-                realGas = gasInGwei;
-                gasText.setText(realGas + "");
-                curTxCost = (new BigDecimal(gasLimit).multiply(new BigDecimal(realGas + "")));
-                gasCostText.setText(curTxCost + "Gwei");
-            }
+        RecyclerView gasPricesRecyclerView = rootView.findViewById(R.id.gas_prices_recycler_view);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
+        gasPricesRecyclerView.setLayoutManager(layoutManager);
+        adapter = new GasPricesAdapter(gasPrices);
+        gasPricesRecyclerView.setAdapter(adapter);
 
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(gasPricesRecyclerView.getContext(),
+                layoutManager.getOrientation());
+        gasPricesRecyclerView.addItemDecoration(dividerItemDecoration);
 
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-        });
-        gasSeekBar.setProgress(0);
-        gasSeekBar.setMax(200);
+        gasPricesRecyclerView.addOnItemTouchListener(
+                new RecyclerItemClickListener(this.getContext(), gasPricesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        if (selected >= 0) {
+                            GasPrice gasPrice = gasPrices.get(selected);
+                            gasPrices.set(selected, GasPrice.newBuilder(gasPrice).setIsSelected(false).build());
+                        }
+                        selected = position;
+                        GasPrice gasPrice = gasPrices.get(selected);
+                        gasPrices.set(selected, GasPrice.newBuilder(gasPrice).setIsSelected(true).build());
+                        adapter.notifyDataSetChanged();
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+                    }
+                })
+        );
+
+//        realGas = gasInGwei;
+//        gasText.setText(realGas + "");
+//        curTxCost = (new BigDecimal(gasLimit).multiply(new BigDecimal(realGas + "")));
+//        gasCostText.setText(curTxCost + "Gwei");
+
         return rootView;
     }
 
@@ -89,11 +104,11 @@ public class GasFragment extends Fragment {
     }
 
     private void updateGasAndNonce(EthGasAndNonce ethGasAndNonce) {
+        gasPrices.clear();
         EthGas ethGas = ethGasAndNonce.getEthGas();
-        gasSeekBar.setMax((int) ethGas.getFastest() / 10);
-        slowGasText.setText("Slow \n" + ethGas.getSafeLowWait() + "m");
-        avgGasText.setText("Avg \n" + ethGas.getAvgWait() + "m");
-        fastGasText.setText("Fast \n" + ethGas.getFastestWait() + "m");
-        gasSeekBar.setProgress((int) ethGas.getAverage() / 10);
+        gasPrices.add(new GasPrice("Slow", ethGas.getSafeLow(), ethGas.getSafeLowWait(), false));
+        gasPrices.add(new GasPrice("Average", ethGas.getAverage(), ethGas.getAvgWait(), false));
+        gasPrices.add(new GasPrice("Fast", ethGas.getFast(), ethGas.getFastWait(), false));
+        adapter.notifyDataSetChanged();
     }
 }
