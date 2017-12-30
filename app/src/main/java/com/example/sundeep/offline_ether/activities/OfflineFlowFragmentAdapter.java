@@ -6,18 +6,19 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import com.example.sundeep.offline_ether.fragments.GasFragment;
-
-import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
+import com.example.sundeep.offline_ether.fragments.OfflineTransaction;
 
 public class OfflineFlowFragmentAdapter extends FragmentPagerAdapter {
 
     private final String address;
+    private final Bundle sharedBundle;
     private int NUM_ITEMS = 3;
     private String[] titles= new String[]{"First Fragment", "Second Fragment","Third Fragment"};
 
-    public OfflineFlowFragmentAdapter(FragmentManager fm, String address) {
+    public OfflineFlowFragmentAdapter(FragmentManager fm, String address, Bundle sharedBundle) {
         super(fm);
         this.address = address;
+        this.sharedBundle = sharedBundle;
     }
 
     @Override
@@ -27,20 +28,18 @@ public class OfflineFlowFragmentAdapter extends FragmentPagerAdapter {
 
     @Override
     public Fragment getItem(int position) {
-        Bundle args = new Bundle();
-        args.putString(PUBLIC_ADDRESS, address);
         switch (position) {
             case 0:
                 GasFragment gasFragment = new GasFragment();
-                gasFragment.setArguments(args);
+                gasFragment.setArguments(sharedBundle);
                 return gasFragment;
             case 1:
-                GasFragment gasFragment2 = new GasFragment();
-                gasFragment2.setArguments(args);
-                return gasFragment2;
+                OfflineTransaction offlineTransaction = new OfflineTransaction();
+                offlineTransaction.setArguments(sharedBundle);
+                return offlineTransaction;
             case 2:
                 GasFragment gasFragment3 = new GasFragment();
-                gasFragment3.setArguments(args);
+                gasFragment3.setArguments(sharedBundle);
                 return gasFragment3;
             default:
                 return null;

@@ -11,17 +11,25 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.R;
+import com.example.sundeep.offline_ether.entities.GasPrice;
+import com.example.sundeep.offline_ether.entities.Nonce;
+import com.example.sundeep.offline_ether.fragments.GasFragment;
 
+import static com.example.sundeep.offline_ether.Constants.GAS_PRICE;
+import static com.example.sundeep.offline_ether.Constants.NONCE;
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
+import static com.example.sundeep.offline_ether.Constants.TYPE;
+import static com.example.sundeep.offline_ether.Constants.WAIT_TIME;
 
-public class OfflineTransactionActivity extends AppCompatActivity {
+public class OfflineTransactionActivity extends AppCompatActivity implements GasFragment.OnGasSelectedListener {
 
     private ViewPager viewPager;
     private LinearLayout dotsLayout;
     private TextView[] dots;
     private int layouts;
-    private Button btnSkip, btnNext;
+    private Button btnBack, btnNext;
     private FragmentPagerAdapter offlineFlowFragmentAdapter;
+    private Bundle sharedBundle = new Bundle();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,11 +37,11 @@ public class OfflineTransactionActivity extends AppCompatActivity {
 
         setContentView(R.layout.offline_transaction);
         String address = getIntent().getStringExtra(PUBLIC_ADDRESS);
+        sharedBundle.putString(PUBLIC_ADDRESS, address);
 
         viewPager = findViewById(R.id.view_pager);
         dotsLayout = findViewById(R.id.layoutDots);
-        btnSkip = findViewById(R.id.btn_skip);
-        btnNext = findViewById(R.id.btn_next);
+
 
         layouts = 3;
 
@@ -41,28 +49,32 @@ public class OfflineTransactionActivity extends AppCompatActivity {
         addBottomDots(0);
 
         viewPager.addOnPageChangeListener(viewPagerPageChangeListener);
-        offlineFlowFragmentAdapter = new OfflineFlowFragmentAdapter(getSupportFragmentManager(), address);
+        offlineFlowFragmentAdapter = new OfflineFlowFragmentAdapter(getSupportFragmentManager(), address, sharedBundle);
         viewPager.setAdapter(offlineFlowFragmentAdapter);
 
-        btnSkip.setOnClickListener(new View.OnClickListener() {
+
+        btnBack = findViewById(R.id.btn_back);
+        btnNext = findViewById(R.id.btn_next);
+        btnBack.setVisibility(View.GONE);
+        btnNext.setEnabled(false);
+        btnBack.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
+                int current = getItem(-1);
+                if (current >= 0) {
+                    viewPager.setCurrentItem(current);
+                }
             }
         });
 
-        btnNext.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                // checking for last page
-                // if last page home screen will be launched
-                int current = getItem(+1);
-                if (current < layouts) {
-                    // move to next screen
-                    viewPager.setCurrentItem(current);
-                } else {
+        setScrollNextButton();
+    }
 
-                }
+    private void setScrollNextButton() {
+        btnNext.setOnClickListener(v -> {
+            int current = getItem(+1);
+            if (current < layouts) {
+                viewPager.setCurrentItem(current);
             }
         });
     }
@@ -92,20 +104,19 @@ public class OfflineTransactionActivity extends AppCompatActivity {
 
     //  viewpager change listener
     ViewPager.OnPageChangeListener viewPagerPageChangeListener = new ViewPager.OnPageChangeListener() {
-
         @Override
         public void onPageSelected(int position) {
             addBottomDots(position);
-
-            // changing the next button text 'NEXT' / 'GOT IT'
-            if (position == layouts - 1) {
-                // last page. make button text to GOT IT
+            if (position == 0) {
                 btnNext.setText("start");
-                btnSkip.setVisibility(View.GONE);
+                btnBack.setVisibility(View.GONE);
             } else {
-                // still pages are left
-                btnNext.setText(getString(R.string.next));
-                btnSkip.setVisibility(View.VISIBLE);
+                if(position == 1){
+                    btnNext.setText("Scan QR");
+                } else {
+                    btnNext.setText("Next");
+                }
+                btnBack.setVisibility(View.VISIBLE);
             }
         }
 
@@ -120,4 +131,12 @@ public class OfflineTransactionActivity extends AppCompatActivity {
         }
     };
 
+    @Override
+    public void onGasSelected(GasPrice gasPrice, Nonce nonce) {
+        sharedBundle.putFloat(GAS_PRICE, gasPrice.getGasPrice());
+        sharedBundle.putFloat(WAIT_TIME, gasPrice.getWaitTime());
+        sharedBundle.putString(TYPE, gasPrice.getType());
+        sharedBundle.putString(NONCE, nonce.getNonce());
+        btnNext.setEnabled(true);
+    }
 }

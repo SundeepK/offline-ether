@@ -1,5 +1,6 @@
 package com.example.sundeep.offline_ether.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
@@ -15,7 +16,7 @@ import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.activities.RecyclerItemClickListener;
 import com.example.sundeep.offline_ether.adapters.GasPricesAdapter;
 import com.example.sundeep.offline_ether.api.RestClient;
-import com.example.sundeep.offline_ether.api.etherscan.EtherApiScan;
+import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.EthGas;
 import com.example.sundeep.offline_ether.entities.EthGasAndNonce;
 import com.example.sundeep.offline_ether.entities.GasPrice;
@@ -27,6 +28,7 @@ import java.util.List;
 
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 
@@ -42,6 +44,13 @@ public class GasFragment extends Fragment {
     private List<GasPrice> gasPrices = new ArrayList<>();
     private GasPricesAdapter adapter;
     private int selected = -1;
+    private OnGasSelectedListener onGasSelectedListener;
+    private Nonce nonce = null;
+    private Disposable subscribe;
+
+    public interface OnGasSelectedListener {
+        public void onGasSelected(GasPrice gasPrice, Nonce nonce);
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -70,6 +79,7 @@ public class GasFragment extends Fragment {
                         selected = position;
                         GasPrice gasPrice = gasPrices.get(selected);
                         gasPrices.set(selected, GasPrice.newBuilder(gasPrice).setIsSelected(true).build());
+                        onGasSelectedListener.onGasSelected(gasPrice, nonce);
                         adapter.notifyItemChanged(selected);
                     }
 
@@ -88,16 +98,32 @@ public class GasFragment extends Fragment {
     }
 
     @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        try {
+            onGasSelectedListener = (OnGasSelectedListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement OnHeadlineSelectedListener");
+        }
+    }
+
+    @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
+        if (subscribe != null) {
+            return;
+        }
+
         String address = getArguments().getString(PUBLIC_ADDRESS);
 
         String etherScanHost = getResources().getString(R.string.etherScanHost);
-        EtherApiScan etherApiScan = new EtherApiScan(new RestClient(new OkHttpClient()), etherScanHost);
-        Observable<EthGas> ethgas = etherApiScan.getEthgas();
-        Observable<Nonce> nonce = etherApiScan.getNonce(address);
+        EtherApi etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
+        Observable<EthGas> ethgas = etherApi.getEthgas();
+        Observable<Nonce> nonce = etherApi.getNonce(address);
 
-        Observable.zip(ethgas, nonce, EthGasAndNonce::new)
+        subscribe = Observable.zip(ethgas, nonce, EthGasAndNonce::new)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .doOnError(e -> Log.e(TAG, "Error fetching transactions", e))
@@ -110,6 +136,7 @@ public class GasFragment extends Fragment {
         gasPrices.add(new GasPrice("Slow", ethGas.getSafeLow(), ethGas.getSafeLowWait(), false));
         gasPrices.add(new GasPrice("Average", ethGas.getAverage(), ethGas.getAvgWait(), false));
         gasPrices.add(new GasPrice("Fast", ethGas.getFast(), ethGas.getFastWait(), false));
+        nonce = ethGasAndNonce.getNonce();
         adapter.notifyDataSetChanged();
     }
 }

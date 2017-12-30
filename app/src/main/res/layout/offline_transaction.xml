@@ -7,7 +7,7 @@
     >
 
 
-    <android.support.v4.view.ViewPager
+    <com.example.sundeep.offline_ether.views.NonSwipeableViewPager
         android:id="@+id/view_pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
@@ -35,15 +35,15 @@
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
         android:text="@string/next"
-        android:textColor="@android:color/white" />
+        />
 
     <Button
-        android:id="@+id/btn_skip"
+        android:id="@+id/btn_back"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
         android:layout_alignParentLeft="true"
         android:text="@string/skip"
-        android:textColor="@android:color/white" />
+        />
 
 </RelativeLayout>

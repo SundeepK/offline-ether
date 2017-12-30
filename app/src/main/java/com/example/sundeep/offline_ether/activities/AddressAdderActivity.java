@@ -9,7 +9,7 @@ import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.entities.Balance;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
-import com.example.sundeep.offline_ether.api.etherscan.EtherApiScan;
+import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.objectbox.AddressRepository;
 
 import java.util.Collections;
@@ -34,14 +34,14 @@ public class AddressAdderActivity extends AppCompatActivity {
         super.onCreate(state);
         setContentView(R.layout.address_adder);
         String etherScanHost = getResources().getString(R.string.etherScanHost);
-        EtherApiScan etherApiScan = new EtherApiScan(new RestClient(new OkHttpClient()), etherScanHost);
+        EtherApi etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
         String address = getIntent().getStringExtra(PUBLIC_ADDRESS);
         Log.d(TAG, "Started with" + address);
 
         Box<EtherAddress> boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
         addressRepository = new AddressRepository(boxStore);
 
-        Observable<List<Balance>> balance = etherApiScan.getBalance(Collections.singletonList(address));
+        Observable<List<Balance>> balance = etherApi.getBalance(Collections.singletonList(address));
 
         balance.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())

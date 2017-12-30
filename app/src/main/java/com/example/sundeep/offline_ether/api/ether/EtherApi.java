@@ -1,4 +1,6 @@
-package com.example.sundeep.offline_ether.api.etherscan;
+package com.example.sundeep.offline_ether.api.ether;
+
+import android.util.Log;
 
 import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.entities.Balance;
@@ -6,6 +8,7 @@ import com.example.sundeep.offline_ether.entities.EthGas;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
 import com.example.sundeep.offline_ether.entities.EtherTransactionResultsJson;
 import com.example.sundeep.offline_ether.entities.Nonce;
+import com.example.sundeep.offline_ether.entities.SentTransaction;
 import com.google.common.base.Joiner;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
@@ -18,7 +21,7 @@ import io.reactivex.Observable;
 import okhttp3.HttpUrl;
 import okhttp3.Request;
 
-public class EtherApiScan {
+public class EtherApi {
 
     private final static String TAG = "EtherApiScan";
     private HttpUrl ethGasApi = HttpUrl.parse("https://ethgasstation.info/json/ethgasAPI.json");
@@ -26,7 +29,7 @@ public class EtherApiScan {
     private String apiEndpoint;
     private Moshi moshi;
 
-    public EtherApiScan(RestClient restClient, String apiEndpoint) {
+    public EtherApi(RestClient restClient, String apiEndpoint) {
         this.restClient = restClient;
         this.apiEndpoint = apiEndpoint;
         this.moshi = new Moshi.Builder().add(new EtherTransaction.EtherTransactionAdapter()).build();
@@ -35,6 +38,7 @@ public class EtherApiScan {
     public Observable<List<Balance>> getBalance(List<String> addresses){
         return Observable.fromCallable(() -> {
             Request balanceReq = getBalanceRequest(addresses);
+            Log.d(TAG, "balanceReq " + balanceReq.url().toString());
             Type type = Types.newParameterizedType(List.class, Balance.class);
             JsonAdapter<List<Balance>> adapter = moshi.adapter(type);
             return restClient.executeGet(balanceReq, adapter);
@@ -66,6 +70,14 @@ public class EtherApiScan {
         });
     }
 
+    public Observable<SentTransaction> sendTransaction(String signedTransaction){
+        return Observable.fromCallable(() -> {
+            Request req = getSignedTransaction(signedTransaction);
+            JsonAdapter<SentTransaction> jsonAdapter = moshi.adapter(SentTransaction.class);
+            return restClient.executeGet(req, jsonAdapter);
+        });
+    }
+
     private Request getBalanceRequest(List<String> addresses) {
         String addressesCommaSeparated = Joiner.on(",").join(addresses);
         HttpUrl url = new HttpUrl.Builder()
@@ -90,6 +102,20 @@ public class EtherApiScan {
                 .addQueryParameter("module", "proxy")
                 .addQueryParameter("action", "eth_getTransactionCount")
                 .addQueryParameter("address", address)
+                .build();
+        return new Request.Builder()
+                .url(url)
+                .build();
+    }
+
+    private Request getSignedTransaction(String signed) {
+        HttpUrl url = new HttpUrl.Builder()
+                .scheme("https")
+                .host(apiEndpoint)
+                .addPathSegment("api")
+                .addQueryParameter("module", "proxy")
+                .addQueryParameter("action", "eth_sendRawTransaction")
+                .addQueryParameter("hex", signed)
                 .build();
         return new Request.Builder()
                 .url(url)
