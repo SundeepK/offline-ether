@@ -11,6 +11,7 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.R;
+import com.example.sundeep.offline_ether.adapters.OfflineFlowFragmentAdapter;
 import com.example.sundeep.offline_ether.entities.GasPrice;
 import com.example.sundeep.offline_ether.entities.Nonce;
 import com.example.sundeep.offline_ether.fragments.GasFragment;

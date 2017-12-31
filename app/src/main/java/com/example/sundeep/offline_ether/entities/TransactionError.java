@@ -1,6 +1,6 @@
 package com.example.sundeep.offline_ether.entities;
 
-class TransactionError {
+public class TransactionError {
 
     private int code;
     private String message;

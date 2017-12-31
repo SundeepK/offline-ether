@@ -6,6 +6,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.api.RestClient;
@@ -31,10 +32,19 @@ public class SendTransactionActivity extends AppCompatActivity {
         setContentView(R.layout.send_transaction);
         ProgressBar progressBar = findViewById(R.id.send_transaction_progress);
         Button okButton = findViewById(R.id.close);
+        TextView message = findViewById(R.id.transaction_send_msg_textview);
+        message.setVisibility(View.GONE);
 
         String transaction = getIntent().getStringExtra(SIGNED_TRANSACTION);
         String etherScanHost = getResources().getString(R.string.etherScanHost);
         EtherApi etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
+        okButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                SendTransactionActivity.this.finish();
+            }
+        });
+        okButton.setVisibility(View.GONE);
 
         etherApi.sendTransaction(transaction)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -42,11 +52,16 @@ public class SendTransactionActivity extends AppCompatActivity {
                 .subscribe(new Observer<SentTransaction>() {
                     @Override
                     public void onSubscribe(Disposable d) {
-                        progressBar.setVisibility(View.VISIBLE);
                     }
 
                     @Override
                     public void onNext(SentTransaction sentTransaction) {
+                        message.setVisibility(View.VISIBLE);
+                        if (sentTransaction.getError() != null) {
+                            message.setText(sentTransaction.getError().getMessage());
+                        } else {
+                            message.setText("Transaction successfully sent.");
+                        }
                     }
 
                     @Override
@@ -59,12 +74,6 @@ public class SendTransactionActivity extends AppCompatActivity {
                         Log.d(TAG, "Completed transaction");
                         okButton.setVisibility(View.VISIBLE);
                         progressBar.setVisibility(View.GONE);
-                        okButton.setOnClickListener(new View.OnClickListener() {
-                            @Override
-                            public void onClick(View v) {
-                                SendTransactionActivity.this.finish();
-                            }
-                        });
                     }
                 });
 

@@ -1,4 +1,4 @@
-package com.example.sundeep.offline_ether.activities;
+package com.example.sundeep.offline_ether.adapters;
 
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -7,6 +7,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 
 import com.example.sundeep.offline_ether.fragments.GasFragment;
 import com.example.sundeep.offline_ether.fragments.OfflineTransaction;
+import com.example.sundeep.offline_ether.fragments.SendTransaction;
 
 public class OfflineFlowFragmentAdapter extends FragmentPagerAdapter {
 
@@ -38,9 +39,9 @@ public class OfflineFlowFragmentAdapter extends FragmentPagerAdapter {
                 offlineTransaction.setArguments(sharedBundle);
                 return offlineTransaction;
             case 2:
-                GasFragment gasFragment3 = new GasFragment();
-                gasFragment3.setArguments(sharedBundle);
-                return gasFragment3;
+                SendTransaction sendTransactionFragment = new SendTransaction();
+                sendTransactionFragment.setArguments(sharedBundle);
+                return sendTransactionFragment;
             default:
                 return null;
         }

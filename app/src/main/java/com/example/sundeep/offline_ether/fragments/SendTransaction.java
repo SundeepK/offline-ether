@@ -48,7 +48,7 @@ public class SendTransaction extends Fragment {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(SendTransaction.this.getContext(), TransactionScannerActivity.class);
-                startActivity(intent);
+                startActivityForResult(intent, 1);
             }
         });
 
@@ -58,6 +58,7 @@ public class SendTransaction extends Fragment {
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        Log.d(TAG, "On results");
         if (requestCode == 1) {
             if(resultCode == Activity.RESULT_OK){
                 String transaction = data.getStringExtra(SIGNED_TRANSACTION);
