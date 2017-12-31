@@ -21,20 +21,25 @@ import android.widget.Toast;
 
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
-import com.example.sundeep.offline_ether.adapters.AddressAdapter;
+import com.example.sundeep.offline_ether.adapters.AccountAdapter;
 import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
+import com.example.sundeep.offline_ether.entities.Balance;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Maps;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import io.objectbox.Box;
 import io.objectbox.android.AndroidScheduler;
 import io.objectbox.query.Query;
 import io.objectbox.reactive.DataObserver;
 import io.objectbox.reactive.DataSubscription;
+import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
@@ -46,7 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private Class<?> clazz;
     private DataSubscription observer;
     private List<EtherAddress> addressList = new ArrayList<>();
-    private AddressAdapter adapter;
+    private AccountAdapter adapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -55,15 +60,12 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        String etherScanHost = getResources().getString(R.string.etherScanHost);
-        EtherApi etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
-
         RecyclerView addressRecyclerView = findViewById(R.id.address_recycler_view);
         TextView balanceTextView = findViewById(R.id.balance);
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         addressRecyclerView.setLayoutManager(layoutManager);
 
-        adapter = new AddressAdapter(addressList);
+        adapter = new AccountAdapter(addressList);
         addressRecyclerView.setAdapter(adapter);
         addressRecyclerView.addOnItemTouchListener(
                 new RecyclerItemClickListener(this.getApplicationContext(), addressRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
@@ -99,6 +101,30 @@ public class MainActivity extends AppCompatActivity {
             }
         });
 
+        findAndUpdateBalances(boxStore.query().build());
+    }
+
+    private void findAndUpdateBalances(Query<EtherAddress> addressQuery) {
+        String etherScanHost = getResources().getString(R.string.etherScanHost);
+        EtherApi etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
+
+        List<EtherAddress> etherAddresses = addressQuery.find();
+        ImmutableMap<String, EtherAddress> addressToEtherAccount = Maps.uniqueIndex(etherAddresses, EtherAddress::getAddress);
+        etherApi.getBalance(addressToEtherAccount.keySet())
+                .subscribeOn(Schedulers.io())
+                .doOnError(err -> Log.e(TAG, "Error occurred while updating balance", err))
+                .subscribe(balances -> updateBalances(addressToEtherAccount, balances.getResult()));
+    }
+
+    private void updateBalances(Map<String, EtherAddress> addressToEtherAccount, List<Balance> balances) {
+        final Box<EtherAddress> boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
+        for (Balance balance : balances) {
+            EtherAddress address = addressToEtherAccount.get(balance.getAccount());
+            EtherAddress newAccount = EtherAddress.newBuilder(address)
+                    .setBalance(balance.getBalance())
+                    .build();
+            boxStore.put(newAccount);
+        }
     }
 
     @NonNull

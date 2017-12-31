@@ -3,7 +3,7 @@ package com.example.sundeep.offline_ether.api.ether;
 import android.util.Log;
 
 import com.example.sundeep.offline_ether.api.RestClient;
-import com.example.sundeep.offline_ether.entities.Balance;
+import com.example.sundeep.offline_ether.entities.Balances;
 import com.example.sundeep.offline_ether.entities.EthGas;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
 import com.example.sundeep.offline_ether.entities.EtherTransactionResultsJson;
@@ -12,9 +12,8 @@ import com.example.sundeep.offline_ether.entities.SentTransaction;
 import com.google.common.base.Joiner;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
-import com.squareup.moshi.Types;
 
-import java.lang.reflect.Type;
+import java.util.Collection;
 import java.util.List;
 
 import io.reactivex.Observable;
@@ -35,13 +34,12 @@ public class EtherApi {
         this.moshi = new Moshi.Builder().add(new EtherTransaction.EtherTransactionAdapter()).build();
     }
 
-    public Observable<List<Balance>> getBalance(List<String> addresses){
+    public Observable<Balances> getBalance(Collection<String> addresses){
         return Observable.fromCallable(() -> {
             Request balanceReq = getBalanceRequest(addresses);
             Log.d(TAG, "balanceReq " + balanceReq.url().toString());
-            Type type = Types.newParameterizedType(List.class, Balance.class);
-            JsonAdapter<List<Balance>> adapter = moshi.adapter(type);
-            return restClient.executeGet(balanceReq, adapter);
+            JsonAdapter<Balances> jsonAdapter = moshi.adapter(Balances.class);
+            return restClient.executeGet(balanceReq, jsonAdapter);
         });
     }
 
@@ -78,7 +76,7 @@ public class EtherApi {
         });
     }
 
-    private Request getBalanceRequest(List<String> addresses) {
+    private Request getBalanceRequest(Collection<String> addresses) {
         String addressesCommaSeparated = Joiner.on(",").join(addresses);
         HttpUrl url = new HttpUrl.Builder()
                 .scheme("https")

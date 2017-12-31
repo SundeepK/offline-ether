@@ -15,12 +15,12 @@ import com.example.sundeep.offline_ether.entities.EtherAddress;
 import java.math.BigDecimal;
 import java.util.List;
 
-public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.EtherAddressViewHolder>{
+public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.EtherAddressViewHolder>{
 
-    List<EtherAddress> etherAddresses;
+    private List<EtherAddress> etherAddresses;
     private final static String TAG  = "AddressAdapter";
 
-    public AddressAdapter(List<EtherAddress> etherAddresses){
+    public AccountAdapter(List<EtherAddress> etherAddresses){
         this.etherAddresses = etherAddresses;
     }
 
@@ -49,7 +49,7 @@ public class AddressAdapter extends RecyclerView.Adapter<AddressAdapter.EtherAdd
 
         viewHolder.address.setText(etherAddresses.get(i).getAddress());
         BigDecimal balance = new BigDecimal(etherAddresses.get(i).getBalance());
-        viewHolder.balance.setText(balance.divide(new BigDecimal("10E18"), 4, BigDecimal.ROUND_HALF_UP).toString() + " ETH");
+        viewHolder.balance.setText(balance.divide(new BigDecimal("1E18"), 2, BigDecimal.ROUND_HALF_UP).toString() + " ETH");
         viewHolder.addressPhoto.setImageBitmap(Blockies.createIcon(etherAddresses.get(i).getAddress(), 30));
     }
 

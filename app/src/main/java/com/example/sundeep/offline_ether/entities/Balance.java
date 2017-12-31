@@ -1,13 +1,11 @@
 package com.example.sundeep.offline_ether.entities;
 
-import java.math.BigInteger;
-
 public class Balance {
 
     private String account;
-    private BigInteger balance;
+    private String balance;
 
-    public Balance(String account, BigInteger balance) {
+    public Balance(String account, String balance) {
         this.account = account;
         this.balance = balance;
     }
@@ -16,7 +14,7 @@ public class Balance {
         return account;
     }
 
-    public BigInteger getBalance() {
+    public String getBalance() {
         return balance;
     }
 

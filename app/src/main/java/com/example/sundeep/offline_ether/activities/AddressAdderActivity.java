@@ -8,6 +8,7 @@ import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.entities.Balance;
+import com.example.sundeep.offline_ether.entities.Balances;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.objectbox.AddressRepository;
@@ -41,12 +42,12 @@ public class AddressAdderActivity extends AppCompatActivity {
         Box<EtherAddress> boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
         addressRepository = new AddressRepository(boxStore);
 
-        Observable<List<Balance>> balance = etherApi.getBalance(Collections.singletonList(address));
+        Observable<Balances> balance = etherApi.getBalance(Collections.singletonList(address));
 
         balance.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .doOnError(e -> Log.e(TAG, "Error fetching balances", e))
-                .subscribe(balances -> saveAddress(balances, address));
+                .subscribe(balances -> saveAddress(balances.getResult(), address));
 
     }
 
