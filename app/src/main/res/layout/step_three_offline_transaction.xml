@@ -1,25 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/bg_screen1">
+    android:layout_height="match_parent">
 
-    <Button
-        android:id="@+id/scan_qr_code_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/send_transaction_button"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="17dp"
-        android:text="Scan QR code" />
+    <me.dm7.barcodescanner.zxing.ZXingScannerView
+        android:id="@+id/qr_scanner"
+        android:layout_height="match_parent"
+        android:layout_width="match_parent"/>
 
-    <Button
-        android:id="@+id/send_transaction_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true"
-        android:layout_marginBottom="51dp"
-        android:text="Send" />
-
-</RelativeLayout>
+</LinearLayout>

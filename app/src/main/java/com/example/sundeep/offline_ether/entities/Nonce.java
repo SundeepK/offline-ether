@@ -2,10 +2,10 @@ package com.example.sundeep.offline_ether.entities;
 
 public class Nonce {
 
-    private String nonce;
+    private String result;
 
-    public Nonce(String nonce) {
-        this.nonce = nonce;
+    public Nonce(String result) {
+        this.result = result;
     }
 
     @Override
@@ -15,22 +15,22 @@ public class Nonce {
 
         Nonce nonce1 = (Nonce) o;
 
-        return nonce != null ? nonce.equals(nonce1.nonce) : nonce1.nonce == null;
+        return result != null ? result.equals(nonce1.result) : nonce1.result == null;
     }
 
     @Override
     public int hashCode() {
-        return nonce != null ? nonce.hashCode() : 0;
+        return result != null ? result.hashCode() : 0;
     }
 
     @Override
     public String toString() {
         return "Nonce{" +
-                "nonce=" + nonce +
+                "result=" + result +
                 '}';
     }
 
     public String getNonce() {
-        return nonce;
+        return result;
     }
 }

@@ -65,7 +65,9 @@ public class OfflineTransaction extends Fragment {
         typeTextView.setText(type);
         gasWaitTextView.setText(wait + "mins");
         gasPriceTextView.setText(price + "Gwei");
-        nonceTextView.setText(nonce);
+        if (nonce != null){
+            nonceTextView.setText(Long.decode(nonce) + "");
+        }
         limitTextView.setText("21000");
     }
 

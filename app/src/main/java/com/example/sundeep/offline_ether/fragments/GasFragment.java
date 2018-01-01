@@ -89,11 +89,6 @@ public class GasFragment extends Fragment {
                 })
         );
 
-//        realGas = gasInGwei;
-//        gasText.setText(realGas + "");
-//        curTxCost = (new BigDecimal(gasLimit).multiply(new BigDecimal(realGas + "")));
-//        gasCostText.setText(curTxCost + "Gwei");
-
         return rootView;
     }
 
@@ -133,10 +128,11 @@ public class GasFragment extends Fragment {
     private void updateGasAndNonce(EthGasAndNonce ethGasAndNonce) {
         gasPrices.clear();
         EthGas ethGas = ethGasAndNonce.getEthGas();
-        gasPrices.add(new GasPrice("Slow", ethGas.getSafeLow(), ethGas.getSafeLowWait(), false));
-        gasPrices.add(new GasPrice("Average", ethGas.getAverage(), ethGas.getAvgWait(), false));
-        gasPrices.add(new GasPrice("Fast", ethGas.getFast(), ethGas.getFastWait(), false));
+        gasPrices.add(new GasPrice("Slow", ethGas.getSafeLow() / 10, ethGas.getSafeLowWait(), false));
+        gasPrices.add(new GasPrice("Average", ethGas.getAverage() / 10, ethGas.getAvgWait(), false));
+        gasPrices.add(new GasPrice("Fast", ethGas.getFast() / 10, ethGas.getFastWait(), false));
         nonce = ethGasAndNonce.getNonce();
+        Log.d(TAG, "nonce" + nonce);
         adapter.notifyDataSetChanged();
     }
 }

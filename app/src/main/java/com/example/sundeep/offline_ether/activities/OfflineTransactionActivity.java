@@ -5,8 +5,8 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
+import android.util.Log;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -16,6 +16,8 @@ import com.example.sundeep.offline_ether.entities.GasPrice;
 import com.example.sundeep.offline_ether.entities.Nonce;
 import com.example.sundeep.offline_ether.fragments.GasFragment;
 
+import mehdi.sakout.fancybuttons.FancyButton;
+
 import static com.example.sundeep.offline_ether.Constants.GAS_PRICE;
 import static com.example.sundeep.offline_ether.Constants.NONCE;
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
@@ -24,11 +26,13 @@ import static com.example.sundeep.offline_ether.Constants.WAIT_TIME;
 
 public class OfflineTransactionActivity extends AppCompatActivity implements GasFragment.OnGasSelectedListener {
 
+    private static final String TAG = "OfflineTransact";
     private ViewPager viewPager;
     private LinearLayout dotsLayout;
     private TextView[] dots;
     private int layouts;
-    private Button btnBack, btnNext;
+    private FancyButton btnBack;
+    private FancyButton btnNext;
     private FragmentPagerAdapter offlineFlowFragmentAdapter;
     private Bundle sharedBundle = new Bundle();
 
@@ -109,13 +113,10 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
         public void onPageSelected(int position) {
             addBottomDots(position);
             if (position == 0) {
-                btnNext.setText("start");
                 btnBack.setVisibility(View.GONE);
             } else {
                 if(position == 1){
                     btnNext.setText("Scan QR");
-                } else {
-                    btnNext.setText("Next");
                 }
                 btnBack.setVisibility(View.VISIBLE);
             }
@@ -134,6 +135,7 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
 
     @Override
     public void onGasSelected(GasPrice gasPrice, Nonce nonce) {
+        Log.d(TAG, "Nonce " + nonce.getNonce());
         sharedBundle.putFloat(GAS_PRICE, gasPrice.getGasPrice());
         sharedBundle.putFloat(WAIT_TIME, gasPrice.getWaitTime());
         sharedBundle.putString(TYPE, gasPrice.getType());

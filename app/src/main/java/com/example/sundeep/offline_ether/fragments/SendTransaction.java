@@ -1,6 +1,5 @@
 package com.example.sundeep.offline_ether.fragments;
 
-import android.app.Activity;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -9,75 +8,39 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.activities.SendTransactionActivity;
-import com.example.sundeep.offline_ether.activities.TransactionScannerActivity;
-import com.example.sundeep.offline_ether.api.RestClient;
-import com.example.sundeep.offline_ether.api.ether.EtherApi;
+import com.google.zxing.Result;
 
-import okhttp3.OkHttpClient;
+import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 import static com.example.sundeep.offline_ether.Constants.SIGNED_TRANSACTION;
 
 
-public class SendTransaction extends Fragment {
+public class SendTransaction extends Fragment implements ZXingScannerView.ResultHandler {
 
     private static final String TAG = "SignOfflineTransaction";
-    private Button scanQr;
-    private Button sendTransaction;
-    private String transaction;
-    EtherApi etherApi;
+    private ZXingScannerView scannerView;
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-
-        String etherScanHost = getResources().getString(R.string.etherScanHost);
-        etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
-
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.step_three_offline_transaction, container, false);
-
-        scanQr = rootView.findViewById(R.id.scan_qr_code_button);
-        sendTransaction = rootView.findViewById(R.id.send_transaction_button);
-        sendTransaction.setVisibility(View.GONE);
-
-
-        scanQr.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(SendTransaction.this.getContext(), TransactionScannerActivity.class);
-                startActivityForResult(intent, 1);
-            }
-        });
-
+        scannerView = rootView.findViewById(R.id.qr_scanner);
         return rootView;
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Log.d(TAG, "On results");
-        if (requestCode == 1) {
-            if(resultCode == Activity.RESULT_OK){
-                String transaction = data.getStringExtra(SIGNED_TRANSACTION);
-                Log.d(TAG, "found transaction " + transaction);
-                sendTransaction.setVisibility(View.VISIBLE);
-                Intent intent = new Intent(SendTransaction.this.getContext(), SendTransactionActivity.class);
-                intent.putExtra(SIGNED_TRANSACTION, transaction);
-                startActivity(intent);
-                getActivity().finish();
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                Log.d(TAG, "cancelled transaction " + transaction);
-            }
-        }
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        scannerView.setResultHandler(this);
+        scannerView.startCamera();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        scannerView.stopCamera();
     }
 
     @Override
@@ -86,4 +49,13 @@ public class SendTransaction extends Fragment {
     }
 
 
+    @Override
+    public void handleResult(Result result) {
+        String transaction = result.getText();
+        Log.d(TAG, "found transaction " + transaction);
+        Intent intent = new Intent(SendTransaction.this.getContext(), SendTransactionActivity.class);
+        intent.putExtra(SIGNED_TRANSACTION, transaction);
+        startActivity(intent);
+        getActivity().finish();
+    }
 }

@@ -45,8 +45,8 @@ public class GasPricesAdapter extends RecyclerView.Adapter<GasPricesAdapter.GasP
         GasPrice gasPrice = gasPrices.get(position);
         viewHolder.gasTitle.setText(gasPrice.getType());
         viewHolder.gasWait.setText(gasPrice.getWaitTime() + "mins");
-        viewHolder.gasPrice.setText(gasPrice.getGasPrice() / 10 + "Gwei");
-        viewHolder.itemView.setBackgroundColor(gasPrice.isSelected()? Color.GREEN : Color.TRANSPARENT);
+        viewHolder.gasPrice.setText(gasPrice.getGasPrice() + "Gwei");
+        viewHolder.itemView.setBackgroundColor(gasPrice.isSelected()? Color.parseColor("#FF212121") : Color.TRANSPARENT);
     }
 
     public static class GasPriceViewHolder extends RecyclerView.ViewHolder {

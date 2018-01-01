@@ -17,51 +17,73 @@ import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
+import mehdi.sakout.fancybuttons.FancyButton;
 import okhttp3.OkHttpClient;
 
 import static com.example.sundeep.offline_ether.Constants.SIGNED_TRANSACTION;
 
 public class SendTransactionActivity extends AppCompatActivity {
 
-
     private final static String TAG = "SendTransactionActivty";
+    private ProgressBar progressBar;
+    private Button okButton;
+    private FancyButton sendButton;
+    private TextView message;
+    private EtherApi etherApi;
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.send_transaction);
-        ProgressBar progressBar = findViewById(R.id.send_transaction_progress);
-        Button okButton = findViewById(R.id.close);
-        TextView message = findViewById(R.id.transaction_send_msg_textview);
+        progressBar = findViewById(R.id.send_transaction_progress);
+        okButton = findViewById(R.id.close_button);
+        sendButton = findViewById(R.id.send_transaction_button);
+        message = findViewById(R.id.transaction_send_msg_textview);
         message.setVisibility(View.GONE);
+        okButton.setVisibility(View.GONE);
 
         String transaction = getIntent().getStringExtra(SIGNED_TRANSACTION);
         String etherScanHost = getResources().getString(R.string.etherScanHost);
-        EtherApi etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
+        etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
         okButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 SendTransactionActivity.this.finish();
             }
         });
-        okButton.setVisibility(View.GONE);
 
+        sendButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sendTransaction(transaction);
+            }
+        });
+
+    }
+
+    private void sendTransaction(String transaction) {
         etherApi.sendTransaction(transaction)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(new Observer<SentTransaction>() {
                     @Override
                     public void onSubscribe(Disposable d) {
+                        sendButton.setVisibility(View.GONE);
+                        progressBar.setVisibility(View.VISIBLE);
                     }
 
                     @Override
                     public void onNext(SentTransaction sentTransaction) {
                         message.setVisibility(View.VISIBLE);
                         if (sentTransaction.getError() != null) {
+                            sendButton.setText("Retry");
+                            sendButton.setVisibility(View.VISIBLE);
                             message.setText(sentTransaction.getError().getMessage());
                         } else {
+                            okButton.setVisibility(View.VISIBLE);
                             message.setText("Transaction successfully sent.");
                         }
+                        progressBar.setVisibility(View.GONE);
                     }
 
                     @Override
@@ -72,11 +94,8 @@ public class SendTransactionActivity extends AppCompatActivity {
                     @Override
                     public void onComplete() {
                         Log.d(TAG, "Completed transaction");
-                        okButton.setVisibility(View.VISIBLE);
-                        progressBar.setVisibility(View.GONE);
                     }
                 });
-
     }
 
 

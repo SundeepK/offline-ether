@@ -2,43 +2,102 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:background="@color/bg_screen1">
+    android:orientation="vertical">
 
     <TextView
-        android:id="@+id/type_textview"
-        android:layout_margin="20dp"
+        android:id="@+id/title"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="20dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:text="Sign transaction"
+        android:textColor="#FBFBFB"
+        android:text="Step 2 Sign transaction/"
+        android:textStyle="bold" />
+
+    <TextView
+        android:layout_marginLeft="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:layout_marginTop="20dp"
+        android:text="Speed"
+        android:textColor="#FBFBFB"
+        android:textStyle="bold" />
+
+    <TextView
+        android:id="@+id/type_textview"
+        android:layout_marginLeft="20dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="#666666" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:textSize="20sp"
+        android:text="Gas limit"
+        android:layout_marginTop="20dp"
+        android:textColor="#FBFBFB"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/gas_limit_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Sign transaction"
-        android:layout_margin="20dp"
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:layout_marginLeft="20dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textSize="20sp"
+        android:layout_marginLeft="20dp"
+        android:textColor="#FBFBFB"
+        android:layout_marginTop="20dp"
+        android:text="Wait time"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/gas_wait_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:layout_marginLeft="20dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_margin="20dp"
-        android:text="Sign transaction"
+        android:layout_marginLeft="20dp"
+        android:text="Gas price"
+        android:textColor="#FBFBFB"
+        android:layout_marginTop="20dp"
         android:textStyle="bold" />
 
     <TextView
         android:id="@+id/gas_price_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textColor="#666666"
+        android:layout_marginLeft="20dp"
+        />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_margin="20dp"
-        android:text="Sign transaction"
+        android:layout_marginLeft="20dp"
+        android:textColor="#FBFBFB"
+        android:layout_marginTop="20dp"
+        android:text="Nonce"
         android:textStyle="bold" />
 
     <TextView
@@ -46,9 +105,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:layout_margin="20dp"
-        android:text="Sign transaction"
-        android:textStyle="bold" />
+        android:textColor="#666666"
+        android:layout_marginLeft="20dp"
+        />
 
 
 </LinearLayout>

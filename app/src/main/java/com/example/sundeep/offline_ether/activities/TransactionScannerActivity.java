@@ -46,6 +46,7 @@ public class TransactionScannerActivity extends AppCompatActivity implements ZXi
         Log.d(TAG, rawResult.getText());
         Intent returnIntent = new Intent();
         returnIntent.putExtra(SIGNED_TRANSACTION, rawResult.getText());
+        returnIntent.putExtra("QR_DATA", rawResult.getRawBytes());
         setResult(Activity.RESULT_OK, returnIntent);
         finish();
     }
