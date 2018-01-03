@@ -2,6 +2,7 @@ package com.example.sundeep.offline_ether.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
@@ -32,10 +33,14 @@ import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 
 public class AccountActivity extends AppCompatActivity {
 
+    private final static String TAG = "AccountActivity";
+
     private AddressRepository addressRepository;
     private TransactionsAdapter adapter;
-    private final static String TAG = "AccountActivity";
     private Box<EtherAddress> addressboxStore;
+    private EtherAddress etherAddress;
+    private String address;
+    private EtherApi etherApi;
 
     @Override
     public void onCreate(Bundle state) {
@@ -52,33 +57,47 @@ public class AccountActivity extends AppCompatActivity {
         addressRecyclerView.addItemDecoration(dividerItemDecoration);
 
         String etherScanHost = getResources().getString(R.string.etherScanHost);
-        EtherApi etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
-        String address = getIntent().getStringExtra(PUBLIC_ADDRESS);
+        etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
+        address = getIntent().getStringExtra(PUBLIC_ADDRESS);
 
         addressboxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
         addressRepository = new AddressRepository(addressboxStore);
 
-        EtherAddress etherAddress = addressRepository.findOne(address);
+        etherAddress = addressRepository.findOne(address);
         ToMany<EtherTransaction> etherTransactions = etherAddress.getEtherTransactions();
         adapter = new TransactionsAdapter(etherTransactions);
         addressRecyclerView.setAdapter(adapter);
 
-        etherApi.getTransactions(address, 1)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .doOnError(e -> Log.e(TAG, "Error fetching transactions", e))
-                .subscribe(balances -> saveAddress(balances, etherAddress));
-
+        loadLast50Transactions();
 
         FloatingActionButton fab = findViewById(R.id.new_offline_transaction);
-        fab.setOnClickListener(new View.OnClickListener() {
+        fab.setOnClickListener(startOfflineTransaction(address));
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadLast50Transactions();
+    }
+
+    @NonNull
+    private View.OnClickListener startOfflineTransaction(String address) {
+        return new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent intent = new Intent(AccountActivity.this, OfflineTransactionActivity.class);
                 intent.putExtra(PUBLIC_ADDRESS, address);
                 startActivity(intent);
             }
-        });
+        };
+    }
+
+    private void loadLast50Transactions() {
+        etherApi.getTransactions(address, 1)
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribeOn(Schedulers.io())
+                .doOnError(e -> Log.e(TAG, "Error fetching transactions", e))
+                .subscribe(balances -> saveAddress(balances, etherAddress));
     }
 
     private void saveAddress(List<EtherTransaction> transactions, EtherAddress address) {

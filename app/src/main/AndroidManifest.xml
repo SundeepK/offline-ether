@@ -14,6 +14,7 @@
         android:supportsRtl="true"
         android:name=".App"
         android:theme="@style/AppTheme">
+        <service android:name=".service.TransactionPoller" android:exported="false"/>
         <activity android:label="New Address" android:name=".activities.AddressScannerActivity"/>
         <activity android:label="New Address" android:name=".activities.AddressAdderActivity"/>
         <activity android:label="Account" android:name=".activities.AccountActivity"/>

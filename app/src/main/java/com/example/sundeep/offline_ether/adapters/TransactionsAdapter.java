@@ -49,9 +49,11 @@ public class TransactionsAdapter extends RecyclerView.Adapter<TransactionsAdapte
         viewHolder.date.setText(dateFormat.format(date));
         BigDecimal balance = new BigDecimal(etherTransactions.get(i).getValue());
         viewHolder.value.setText(balance.divide(new BigDecimal("10E18"), 4, BigDecimal.ROUND_HALF_UP).toString() + " ETH".toString());
+        viewHolder.confirmationsTextView.setText(etherTransactions.get(i).getConfirmations() + "");
     }
 
     public static class EtherTransactionViewHolder extends RecyclerView.ViewHolder {
+        TextView confirmationsTextView;
         TextView date;
         TextView value;
         TextView isOutGoing;
@@ -62,6 +64,7 @@ public class TransactionsAdapter extends RecyclerView.Adapter<TransactionsAdapte
             date = itemView.findViewById(R.id.date);
             value = itemView.findViewById(R.id.value);
             isOutGoing = itemView.findViewById(R.id.isOutGoing);
+            confirmationsTextView = itemView.findViewById(R.id.confirmations_textview);
             confirmations = itemView.findViewById(R.id.confirmations_imageview);
         }
     }
