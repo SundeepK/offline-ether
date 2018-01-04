@@ -7,6 +7,7 @@ import android.graphics.Paint;
 import android.graphics.PorterDuff;
 import android.graphics.PorterDuffXfermode;
 import android.graphics.Rect;
+import android.graphics.RectF;
 
 import java.util.Arrays;
 
@@ -16,24 +17,24 @@ public class Blockies {
     private static long[] randseed = new long[4];
 
     public static Bitmap createIcon(String address) {
-        return createIcon(address, 16);
+        return createIcon(address, new BlockiesOpts(16, 0, 0));
     }
 
-    public static Bitmap createIcon(String address, int scale) {
+    public static Bitmap createIcon(String address, BlockiesOpts blockiesOpts) {
         seedrand(address);
         HSL color = createColor();
         HSL bgColor = createColor();
         HSL spotColor = createColor();
 
         double[] imgdata = createImageData();
-        return createCanvas(imgdata, color, bgColor, spotColor, scale);
+        return createCanvas(imgdata, color, bgColor, spotColor, blockiesOpts);
     }
 
-    private static Bitmap createCanvas(double[] imgData, HSL color, HSL bgcolor, HSL spotcolor, int scale) {
+    private static Bitmap createCanvas(double[] imgData, HSL color, HSL bgcolor, HSL spotcolor, BlockiesOpts blockiesOpts) {
         int width = (int) Math.sqrt(imgData.length);
 
-        int w = width * scale;
-        int h = width * scale;
+        int w = width * blockiesOpts.scale;
+        int h = width * blockiesOpts.scale;
 
         Bitmap.Config conf = Bitmap.Config.ARGB_8888;
         Bitmap bmp = Bitmap.createBitmap(w, h, conf);
@@ -57,10 +58,14 @@ public class Blockies {
             paint.setColor((imgData[i] == 1.0d) ? main : scolor);
 
             if (imgData[i] > 0d) {
-                canvas.drawRect(col * scale, row * scale, (col * scale) + scale, (row * scale) + scale, paint);
+                canvas.drawRect(col * blockiesOpts.scale,
+                        row * blockiesOpts.scale,
+                        (col * blockiesOpts.scale) + blockiesOpts.scale,
+                        (row * blockiesOpts.scale) + blockiesOpts.scale,
+                        paint);
             }
         }
-        return getCroppedBitmap(bmp);
+        return getCroppedBitmap(bmp, blockiesOpts);
     }
 
     private static double rand() {
@@ -76,9 +81,8 @@ public class Blockies {
 
     private static HSL createColor() {
         double h = Math.floor(rand() * 360d);
-        double s = ((rand() * 60d) + 40d);
-        double l = ((rand() + rand() + rand() + rand()) * 25d);
-        return new HSL(h, s, l);
+        double s = ((rand() * 42));
+        return new HSL(h, s, 45);
     }
 
     private static double[] createImageData() {
@@ -128,9 +132,7 @@ public class Blockies {
     }
 
     private static void seedrand(String seed) {
-        for (int i = 0; i < randseed.length; i++) {
-            randseed[i] = 0;
-        }
+        randseed = new long[4];
         for (int i = 0; i < seed.length(); i++) {
             long test = randseed[i % 4] << 5;
             if (test > Integer.MAX_VALUE << 1 || test < Integer.MIN_VALUE << 1)
@@ -188,7 +190,7 @@ public class Blockies {
         return p;
     }
 
-    public static Bitmap getCroppedBitmap(Bitmap bitmap) {
+    public static Bitmap getCroppedBitmap(Bitmap bitmap, BlockiesOpts blockiesOpts) {
         Bitmap output = Bitmap.createBitmap(bitmap.getWidth(),
                 bitmap.getHeight(), Bitmap.Config.ARGB_8888);
         Canvas canvas = new Canvas(output);
@@ -196,15 +198,27 @@ public class Blockies {
         final int color = 0xff424242;
         final Paint paint = new Paint();
         final Rect rect = new Rect(0, 0, bitmap.getWidth(), bitmap.getHeight());
+        final RectF rectf = new RectF(0, 0, bitmap.getWidth(), bitmap.getHeight());
 
         paint.setAntiAlias(true);
         canvas.drawARGB(0, 0, 0, 0);
         paint.setColor(color);
-        canvas.drawCircle(bitmap.getWidth() / 2, bitmap.getHeight() / 2,
-                bitmap.getWidth() / 2, paint);
+        canvas.drawRoundRect(rectf, blockiesOpts.rx, blockiesOpts.ry, paint);
         paint.setXfermode(new PorterDuffXfermode(PorterDuff.Mode.SRC_IN));
         canvas.drawBitmap(bitmap, rect, rect, paint);
         return output;
+    }
+
+    public static class BlockiesOpts{
+        int scale;
+        int rx;
+        int ry;
+
+        public BlockiesOpts(int scale, int rx, int ry) {
+            this.scale = scale;
+            this.rx = rx;
+            this.ry = ry;
+        }
     }
 
     static class HSL {

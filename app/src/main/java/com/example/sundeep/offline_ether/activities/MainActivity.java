@@ -149,7 +149,7 @@ public class MainActivity extends AppCompatActivity {
         for(EtherAddress address: addressList){
             balance = balance.add(new BigDecimal(address.getBalance()));
         }
-        return balance.divide(new BigDecimal("10E18"), 4, BigDecimal.ROUND_HALF_UP).toString();
+        return balance.divide(new BigDecimal("1E18"), 4, BigDecimal.ROUND_HALF_UP).toString();
     }
 
     public void launchActivity(Class<?> clss) {

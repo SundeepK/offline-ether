@@ -35,6 +35,9 @@ public class EtherApi {
     }
 
     public Observable<Balances> getBalance(Collection<String> addresses){
+        if (addresses.isEmpty()) {
+            return Observable.empty();
+        }
         return Observable.fromCallable(() -> {
             Request balanceReq = getBalanceRequest(addresses);
             Log.d(TAG, "balanceReq " + balanceReq.url().toString());

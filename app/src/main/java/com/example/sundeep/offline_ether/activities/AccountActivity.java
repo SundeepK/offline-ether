@@ -1,6 +1,7 @@
 package com.example.sundeep.offline_ether.activities;
 
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
@@ -9,18 +10,22 @@ import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.adapters.TransactionsAdapter;
 import com.example.sundeep.offline_ether.api.RestClient;
+import com.example.sundeep.offline_ether.api.ether.EtherApi;
+import com.example.sundeep.offline_ether.blockies.Blockies;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
-import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.objectbox.AddressRepository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 import io.objectbox.Box;
@@ -47,8 +52,14 @@ public class AccountActivity extends AppCompatActivity {
         super.onCreate(state);
         setContentView(R.layout.account);
 
+        address = getIntent().getStringExtra(PUBLIC_ADDRESS);
         RecyclerView addressRecyclerView = findViewById(R.id.transactions_recycler_view);
         TextView balanceTextView = findViewById(R.id.balance);
+        ImageView addressPhoto = findViewById(R.id.address_photo);
+        TextView addressTextView = findViewById(R.id.address_textview);
+        addressPhoto.setImageBitmap(Blockies.createIcon(address, new Blockies.BlockiesOpts(20, 0, 0)));
+        addressTextView.setText(address);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         addressRecyclerView.setLayoutManager(layoutManager);
 
@@ -58,20 +69,26 @@ public class AccountActivity extends AppCompatActivity {
 
         String etherScanHost = getResources().getString(R.string.etherScanHost);
         etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
-        address = getIntent().getStringExtra(PUBLIC_ADDRESS);
 
         addressboxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
         addressRepository = new AddressRepository(addressboxStore);
 
         etherAddress = addressRepository.findOne(address);
+        balanceTextView.setText(new BigDecimal(etherAddress.getBalance()).divide(new BigDecimal("1E18"), 4, BigDecimal.ROUND_HALF_UP).toString() + " ETH");
         ToMany<EtherTransaction> etherTransactions = etherAddress.getEtherTransactions();
-        adapter = new TransactionsAdapter(etherTransactions);
+        int paddingPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
+        adapter = new TransactionsAdapter(etherTransactions, address, drawable(R.drawable.orange_rounded_corner),
+                drawable(R.drawable.green_rounded_corner), drawable(R.drawable.dark_rounded_corner), paddingPx);
         addressRecyclerView.setAdapter(adapter);
 
         loadLast50Transactions();
 
         FloatingActionButton fab = findViewById(R.id.new_offline_transaction);
         fab.setOnClickListener(startOfflineTransaction(address));
+    }
+
+    private Drawable drawable(int drawable) {
+        return getResources().getDrawable(drawable);
     }
 
     @Override
