@@ -7,8 +7,6 @@
     android:background="#292929"
     tools:context="com.example.sundeep.offline_ether.activities.MainActivity">
 
-    <include layout="@layout/toolbar" />
-
     <include layout="@layout/content_main" />
 
     <android.support.design.widget.FloatingActionButton

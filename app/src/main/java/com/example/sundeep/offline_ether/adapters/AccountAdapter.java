@@ -49,7 +49,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.EtherAdd
 
         viewHolder.address.setText(etherAddresses.get(i).getAddress());
         BigDecimal balance = new BigDecimal(etherAddresses.get(i).getBalance());
-        viewHolder.balance.setText(balance.divide(new BigDecimal("1E18"), 2, BigDecimal.ROUND_HALF_UP).toString() + " ETH");
+        viewHolder.balance.setText(balance.divide(new BigDecimal("1E18"), 4, BigDecimal.ROUND_HALF_UP).toString() + " ETH");
         viewHolder.addressPhoto.setImageBitmap(Blockies.createIcon(etherAddresses.get(i).getAddress(), new Blockies.BlockiesOpts(30, 10, 10)));
     }
 
