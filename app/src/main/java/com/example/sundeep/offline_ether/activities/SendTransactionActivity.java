@@ -35,6 +35,8 @@ public class SendTransactionActivity extends AppCompatActivity {
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.send_transaction);
+
+        // views
         progressBar = findViewById(R.id.send_transaction_progress);
         okButton = findViewById(R.id.close_button);
         sendButton = findViewById(R.id.send_transaction_button);

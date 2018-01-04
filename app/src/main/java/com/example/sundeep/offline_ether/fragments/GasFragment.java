@@ -2,6 +2,7 @@ package com.example.sundeep.offline_ether.fragments;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v7.widget.DividerItemDecoration;
@@ -67,29 +68,32 @@ public class GasFragment extends Fragment {
                 layoutManager.getOrientation());
         gasPricesRecyclerView.addItemDecoration(dividerItemDecoration);
 
-        gasPricesRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(this.getContext(), gasPricesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        if (selected >= 0) {
-                            GasPrice gasPrice = gasPrices.get(selected);
-                            gasPrices.set(selected, GasPrice.newBuilder(gasPrice).setIsSelected(false).build());
-                            adapter.notifyItemChanged(selected);
-                        }
-                        selected = position;
-                        GasPrice gasPrice = gasPrices.get(selected);
-                        gasPrices.set(selected, GasPrice.newBuilder(gasPrice).setIsSelected(true).build());
-                        onGasSelectedListener.onGasSelected(gasPrice, nonce);
-                        adapter.notifyItemChanged(selected);
-                    }
-
-                    @Override
-                    public void onLongItemClick(View view, int position) {
-                    }
-                })
-        );
+        gasPricesRecyclerView.addOnItemTouchListener(getGasPriceOnClick(gasPricesRecyclerView));
 
         return rootView;
+    }
+
+    @NonNull
+    private RecyclerItemClickListener getGasPriceOnClick(RecyclerView gasPricesRecyclerView) {
+        return new RecyclerItemClickListener(this.getContext(), gasPricesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
+            @Override
+            public void onItemClick(View view, int position) {
+                if (selected >= 0) {
+                    GasPrice gasPrice = gasPrices.get(selected);
+                    gasPrices.set(selected, GasPrice.newBuilder(gasPrice).setIsSelected(false).build());
+                    adapter.notifyItemChanged(selected);
+                }
+                selected = position;
+                GasPrice gasPrice = gasPrices.get(selected);
+                gasPrices.set(selected, GasPrice.newBuilder(gasPrice).setIsSelected(true).build());
+                onGasSelectedListener.onGasSelected(gasPrice, nonce);
+                adapter.notifyItemChanged(selected);
+            }
+
+            @Override
+            public void onLongItemClick(View view, int position) {
+            }
+        });
     }
 
     @Override

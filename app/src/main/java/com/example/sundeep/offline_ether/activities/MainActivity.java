@@ -59,9 +59,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        // set views
+        FloatingActionButton fab = findViewById(R.id.fab);
         RecyclerView addressRecyclerView = findViewById(R.id.address_recycler_view);
         TextView balanceTextView = findViewById(R.id.balance);
+
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
         addressRecyclerView.setLayoutManager(layoutManager);
 
@@ -95,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
                 .on(AndroidScheduler.mainThread())
                 .observer(onDataChanged(balanceTextView));
 
-        FloatingActionButton fab = findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

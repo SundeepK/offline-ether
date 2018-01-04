@@ -46,7 +46,9 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
 
         viewPager = findViewById(R.id.view_pager);
         dotsLayout = findViewById(R.id.layoutDots);
-
+        btnBack = findViewById(R.id.btn_back);
+        btnNext = findViewById(R.id.btn_next);
+        btnBack.setVisibility(View.GONE);
 
         layouts = 3;
 
@@ -58,9 +60,7 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
         viewPager.setAdapter(offlineFlowFragmentAdapter);
 
 
-        btnBack = findViewById(R.id.btn_back);
-        btnNext = findViewById(R.id.btn_next);
-        btnBack.setVisibility(View.GONE);
+
         btnNext.setEnabled(false);
         btnBack.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -31,6 +31,7 @@ public class OfflineTransaction extends Fragment {
 
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.step_two_offline_transaction, container, false);
 
+        // views
         typeTextView = rootView.findViewById(R.id.type_textview);
         gasPriceTextView = rootView.findViewById(R.id.gas_price_textview);
         limitTextView = rootView.findViewById(R.id.gas_limit_textview);

@@ -52,11 +52,14 @@ public class AccountActivity extends AppCompatActivity {
         super.onCreate(state);
         setContentView(R.layout.account);
 
+        // views
         address = getIntent().getStringExtra(PUBLIC_ADDRESS);
         RecyclerView addressRecyclerView = findViewById(R.id.transactions_recycler_view);
         TextView balanceTextView = findViewById(R.id.balance);
         ImageView addressPhoto = findViewById(R.id.address_photo);
         TextView addressTextView = findViewById(R.id.address_textview);
+        FloatingActionButton fab = findViewById(R.id.new_offline_transaction);
+
         addressPhoto.setImageBitmap(Blockies.createIcon(address, new Blockies.BlockiesOpts(20, 0, 0)));
         addressTextView.setText(address);
 
@@ -83,7 +86,6 @@ public class AccountActivity extends AppCompatActivity {
 
         loadLast50Transactions();
 
-        FloatingActionButton fab = findViewById(R.id.new_offline_transaction);
         fab.setOnClickListener(startOfflineTransaction(address));
     }
 
