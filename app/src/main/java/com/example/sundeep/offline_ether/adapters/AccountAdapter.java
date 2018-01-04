@@ -11,8 +11,8 @@ import android.widget.TextView;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.blockies.Blockies;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
+import com.example.sundeep.offline_ether.utils.EtherMath;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.EtherAddressViewHolder>{
@@ -46,11 +46,10 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.EtherAdd
     @Override
     public void onBindViewHolder(EtherAddressViewHolder viewHolder, int i) {
         Log.d(TAG, "render: " + i);
-
-        viewHolder.address.setText(etherAddresses.get(i).getAddress());
-        BigDecimal balance = new BigDecimal(etherAddresses.get(i).getBalance());
-        viewHolder.balance.setText(balance.divide(new BigDecimal("1E18"), 4, BigDecimal.ROUND_HALF_UP).toString() + " ETH");
-        viewHolder.addressPhoto.setImageBitmap(Blockies.createIcon(etherAddresses.get(i).getAddress(), new Blockies.BlockiesOpts(30, 10, 10)));
+        EtherAddress etherAddress = etherAddresses.get(i);
+        viewHolder.address.setText(etherAddress.getAddress());
+        viewHolder.balance.setText(EtherMath.weiAsEtherStr(etherAddress.getBalance()));
+        viewHolder.addressPhoto.setImageBitmap(Blockies.createIcon(etherAddress.getAddress(), new Blockies.BlockiesOpts(30, 10, 10)));
     }
 
     public static class EtherAddressViewHolder extends RecyclerView.ViewHolder {

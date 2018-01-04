@@ -10,9 +10,9 @@ import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
+import com.example.sundeep.offline_ether.utils.EtherMath;
 import com.facebook.shimmer.ShimmerFrameLayout;
 
-import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -61,10 +61,9 @@ public class TransactionsAdapter extends RecyclerView.Adapter<TransactionsAdapte
         EtherTransaction etherTransaction = etherTransactions.get(i);
         Date date = new Date(etherTransaction.getTimeStamp() * 1000);
         viewHolder.date.setText(dateFormat.format(date));
-        BigDecimal balance = new BigDecimal(etherTransaction.getValue());
-        viewHolder.value.setText(balance.divide(new BigDecimal("10E18"), 4, BigDecimal.ROUND_HALF_UP).toString() + " ETH".toString());
+        viewHolder.value.setText(EtherMath.weiAsEtherStr(etherTransaction.getValue()));
         viewHolder.confirmationsTextView.setText(etherTransaction.getConfirmations() + "");
-        if (etherTransaction.getConfirmations() <= 0) {
+        if (etherTransaction.getConfirmations() <= 10) {
             viewHolder.inOrOut.setText("PEND");
             viewHolder.inOrOut.setBackground(loadingDrawable);
             viewHolder.shimmer.startShimmerAnimation();

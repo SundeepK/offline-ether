@@ -15,6 +15,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 
 public class GasPricesAdapter extends RecyclerView.Adapter<GasPricesAdapter.GasPriceViewHolder> {
+
     private final static String TAG  = "AddressAdapter";
     private List<GasPrice> gasPrices;
     private SimpleDateFormat dateFormat = new SimpleDateFormat("E d MMM yyyy H:m");

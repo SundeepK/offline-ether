@@ -22,14 +22,17 @@ import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.blockies.Blockies;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
+import com.example.sundeep.offline_ether.entities.EtherAddress_;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
 import com.example.sundeep.offline_ether.objectbox.AddressRepository;
+import com.example.sundeep.offline_ether.utils.EtherMath;
 
-import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.List;
 
 import io.objectbox.Box;
-import io.objectbox.relation.ToMany;
+import io.objectbox.android.AndroidScheduler;
+import io.objectbox.reactive.DataSubscription;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import okhttp3.OkHttpClient;
@@ -46,6 +49,8 @@ public class AccountActivity extends AppCompatActivity {
     private EtherAddress etherAddress;
     private String address;
     private EtherApi etherApi;
+    private List<EtherTransaction> etherTransactionsList = new ArrayList<>();
+    private DataSubscription observer;
 
     @Override
     public void onCreate(Bundle state) {
@@ -77,16 +82,34 @@ public class AccountActivity extends AppCompatActivity {
         addressRepository = new AddressRepository(addressboxStore);
 
         etherAddress = addressRepository.findOne(address);
-        balanceTextView.setText(new BigDecimal(etherAddress.getBalance()).divide(new BigDecimal("1E18"), 4, BigDecimal.ROUND_HALF_UP).toString() + " ETH");
-        ToMany<EtherTransaction> etherTransactions = etherAddress.getEtherTransactions();
+        balanceTextView.setText(EtherMath.weiAsEtherStr(etherAddress.getBalance()));
+        etherTransactionsList.addAll(etherAddress.getEtherTransactions());
+
         int paddingPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
-        adapter = new TransactionsAdapter(etherTransactions, address, drawable(R.drawable.orange_rounded_corner),
+        adapter = new TransactionsAdapter(etherTransactionsList, address, drawable(R.drawable.orange_rounded_corner),
                 drawable(R.drawable.green_rounded_corner), drawable(R.drawable.dark_rounded_corner), paddingPx);
         addressRecyclerView.setAdapter(adapter);
 
-        loadLast50Transactions();
-
         fab.setOnClickListener(startOfflineTransaction(address));
+
+        listenForTransactions();
+    }
+
+    private void listenForTransactions() {
+        observer = addressboxStore.query()
+                .equal(EtherAddress_.address, address)
+                .build()
+                .subscribe()
+                .on(AndroidScheduler.mainThread())
+                .observer(address -> {
+                    // should only be one address
+                    if (!address.isEmpty()) {
+                        Log.d(TAG, "Update for " + etherAddress.getAddress() + " with transactions " + etherAddress.getEtherTransactions().size());
+                        etherTransactionsList.clear();
+                        etherTransactionsList.addAll(address.get(0).getEtherTransactions());
+                        adapter.notifyDataSetChanged();
+                    }
+                });
     }
 
     private Drawable drawable(int drawable) {
@@ -96,19 +119,23 @@ public class AccountActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        Log.d(TAG, "Resume called");
         loadLast50Transactions();
     }
 
     @NonNull
     private View.OnClickListener startOfflineTransaction(String address) {
-        return new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent intent = new Intent(AccountActivity.this, OfflineTransactionActivity.class);
-                intent.putExtra(PUBLIC_ADDRESS, address);
-                startActivity(intent);
-            }
+        return view -> {
+            Intent intent = new Intent(AccountActivity.this, OfflineTransactionActivity.class);
+            intent.putExtra(PUBLIC_ADDRESS, address);
+            startActivity(intent);
         };
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        observer.cancel();
     }
 
     private void loadLast50Transactions() {

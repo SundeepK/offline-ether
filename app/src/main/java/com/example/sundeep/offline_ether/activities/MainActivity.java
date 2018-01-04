@@ -28,6 +28,7 @@ import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.Balance;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
+import com.example.sundeep.offline_ether.utils.EtherMath;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
@@ -144,7 +145,7 @@ public class MainActivity extends AppCompatActivity {
                     addressList.clear();
                     addressList.addAll(newAddresses);
                     Log.d(TAG, "addressList:" + addressList);
-                    balanceTextView.setText(calculateBalance() + " ETH");
+                    balanceTextView.setText(calculateBalance());
                     adapter.notifyDataSetChanged();
                 }
             }
@@ -156,7 +157,7 @@ public class MainActivity extends AppCompatActivity {
         for(EtherAddress address: addressList){
             balance = balance.add(new BigDecimal(address.getBalance()));
         }
-        return balance.divide(new BigDecimal("1E18"), 4, BigDecimal.ROUND_HALF_UP).toString();
+        return EtherMath.weiAsEtherStr(balance);
     }
 
     public void launchActivity(Class<?> clss) {
