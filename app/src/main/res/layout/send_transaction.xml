@@ -17,14 +17,21 @@
         android:layout_centerHorizontal="true"
         android:layout_centerVertical="true" />
 
-    <Button
+    <mehdi.sakout.fancybuttons.FancyButton
         android:id="@+id/close_button"
         android:layout_width="match_parent"
-        android:layout_height="69dp"
+        android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentEnd="true"
-        android:layout_toEndOf="@+id/send_transaction_button"
-        android:text="OK" />
+        fancy:fb_textColor="#494949"
+        fancy:fb_radius="30dp"
+        fancy:fb_defaultColor="#EEEEEE"
+        fancy:fb_focusColor="#5D5D5D"
+        android:padding="15dp"
+        android:layout_margin="10dp"
+        fancy:fb_textSize="16sp"
+        fancy:fb_disabledColor="#5D5D5D"
+        android:text="Send"
+        />
 
     <mehdi.sakout.fancybuttons.FancyButton
         android:id="@+id/send_transaction_button"
@@ -42,16 +49,17 @@
         android:text="Send"
         />
 
-
     <TextView
         android:id="@+id/transaction_send_msg_textview"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_marginTop="30dp"
         android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
         android:visibility="gone"
         android:layout_margin="20dp"
-        android:textSize="16sp"
+        android:textColor="#FBFBFB"
+        android:textSize="24sp"
         android:text="TextView" />
 
 </RelativeLayout>

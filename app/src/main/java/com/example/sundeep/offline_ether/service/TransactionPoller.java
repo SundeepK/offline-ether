@@ -66,8 +66,7 @@ public class TransactionPoller extends IntentService {
         Observable.merge(transactions)
                 .flatMap(this::getTransactions)
                 .repeatWhen(completed -> completed.delay(30, TimeUnit.SECONDS))
-                .doOnError(e -> Log.d(TAG, "Error when polling transactions", e))
-                .subscribe(this::handleUpdates);
+                .subscribe(this::handleUpdates, e -> Log.e(TAG, "Error fetching transactions", e));
     }
 
     private Observable<Pair<String, List<EtherTransaction>>> getTransactions(String address) {

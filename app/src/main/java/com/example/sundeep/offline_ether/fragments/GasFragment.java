@@ -125,8 +125,7 @@ public class GasFragment extends Fragment {
         subscribe = Observable.zip(ethgas, nonce, EthGasAndNonce::new)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .doOnError(e -> Log.e(TAG, "Error fetching transactions", e))
-                .subscribe(this::updateGasAndNonce);
+                .subscribe(this::updateGasAndNonce, e -> Log.e(TAG, "Error fetching transactions", e));
     }
 
     private void updateGasAndNonce(EthGasAndNonce ethGasAndNonce) {

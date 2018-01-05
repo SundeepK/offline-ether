@@ -152,7 +152,6 @@ public class AccountActivity extends AppCompatActivity {
         address.getEtherTransactions().clear();
         address.getEtherTransactions().addAll(transactions);
         addressboxStore.put(address);
-        adapter.notifyDataSetChanged();
     }
 
 }
