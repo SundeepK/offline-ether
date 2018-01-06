@@ -19,14 +19,18 @@ import com.example.sundeep.offline_ether.utils.EtherMath;
 import java.math.BigDecimal;
 import java.text.NumberFormat;
 import java.util.Currency;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 import io.objectbox.Box;
+import io.objectbox.android.AndroidScheduler;
 import io.objectbox.query.Query;
 import io.objectbox.reactive.DataObserver;
 import io.objectbox.reactive.DataSubscription;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
@@ -39,6 +43,8 @@ public class BalanceCurrency extends Fragment {
     private TextView balance;
     private EtherApi etherApi;
     private Box<EtherAddress> boxStore;
+    private long lastUpdate = 0;
+    private Map<String, String> cachedPrices = new HashMap<>();
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -51,19 +57,23 @@ public class BalanceCurrency extends Fragment {
         String etherScanHost = getResources().getString(R.string.etherScanHost);
         etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
 
-
         boxStore = ((App) getActivity().getApplication()).getBoxStore().boxFor(EtherAddress.class);
+        return rootView;
+    }
+
+    private void refreshData() {
         Query<EtherAddress> addressQuery = boxStore.query().build();
         observer = addressQuery
                 .subscribe()
+                .on(AndroidScheduler.mainThread())
                 .observer(onAddress());
-
-        return rootView;
     }
 
     @Override
     public void onResume() {
         super.onResume();
+        Log.d(TAG, "ONResume");
+        refreshData();
     }
 
     @Override
@@ -81,10 +91,18 @@ public class BalanceCurrency extends Fragment {
     }
 
     private void updateBalanceInCurrency(BigDecimal ether) {
-        etherApi.getPrices()
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(convertEtherPriceToFiat(ether), e -> Log.e(TAG, "Error fetching prices", e));
+            getPrices()
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeOn(Schedulers.io())
+                    .subscribe(convertEtherPriceToFiat(ether), e -> Log.e(TAG, "Error fetching prices", e));
+    }
+
+    private Observable<Map<String, String>> getPrices() {
+        if(TimeUnit.SECONDS.convert(System.currentTimeMillis() - lastUpdate, TimeUnit.MILLISECONDS) > 60){
+            lastUpdate = System.currentTimeMillis();
+            return etherApi.getPrices();
+        }
+        return Observable.just(cachedPrices);
     }
 
     @NonNull
@@ -92,6 +110,7 @@ public class BalanceCurrency extends Fragment {
         return new Consumer<Map<String, String>>() {
             @Override
             public void accept(Map<String, String> currToPrice) throws Exception {
+                cachedPrices.putAll(currToPrice);
                 Currency currency = Currency.getInstance(Locale.getDefault());
                 String currencyCode = currency.getCurrencyCode();
 
