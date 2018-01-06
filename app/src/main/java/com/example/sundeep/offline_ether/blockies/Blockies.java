@@ -26,11 +26,11 @@ public class Blockies {
         HSL bgColor = createColor();
         HSL spotColor = createColor();
 
-        double[] imgdata = createImageData();
+        int[] imgdata = createImageData();
         return createCanvas(imgdata, color, bgColor, spotColor, blockiesOpts);
     }
 
-    private static Bitmap createCanvas(double[] imgData, HSL color, HSL bgcolor, HSL spotcolor, BlockiesOpts blockiesOpts) {
+    private static Bitmap createCanvas(int[] imgData, HSL color, HSL bgcolor, HSL spotcolor, BlockiesOpts blockiesOpts) {
         int width = (int) Math.sqrt(imgData.length);
 
         int w = width * blockiesOpts.scale;
@@ -85,22 +85,22 @@ public class Blockies {
         return new HSL(h, s, 45);
     }
 
-    private static double[] createImageData() {
+    private static int[] createImageData() {
         int width = size;
         int height = size;
 
-        double dataWidth = Math.ceil(width / 2);
-        double mirrorWidth = width - dataWidth;
+        int dataWidth = (int) Math.ceil(width / 2);
+        int mirrorWidth = width - dataWidth;
 
-        double[] data = new double[size * size];
+        int[] data = new int[size * size];
         int dataCount = 0;
         for (int y = 0; y < height; y++) {
-            double[] row = new double[(int) dataWidth];
+            int[] row = new int[dataWidth];
             for (int x = 0; x < dataWidth; x++) {
-                row[x] = Math.floor(rand() * 2.3d);
-
+                row[x] = (int) Math.floor(rand() * 2.3f);
             }
-            double[] r = Arrays.copyOfRange(row, 0, (int) mirrorWidth);
+
+            int[] r = Arrays.copyOfRange(row, 0, mirrorWidth);
             r = reverse(r);
             row = concat(row, r);
 
@@ -113,18 +113,18 @@ public class Blockies {
         return data;
     }
 
-    public static double[] concat(double[] a, double[] b) {
+    public static int[] concat(int[] a, int[] b) {
         int aLen = a.length;
         int bLen = b.length;
-        double[] c = new double[aLen + bLen];
+        int[] c = new int[aLen + bLen];
         System.arraycopy(a, 0, c, 0, aLen);
         System.arraycopy(b, 0, c, aLen, bLen);
         return c;
     }
 
-    private static double[] reverse(double[] data) {
+    private static int[] reverse(int[] data) {
         for (int i = 0; i < data.length / 2; i++) {
-            double temp = data[i];
+            int temp = data[i];
             data[i] = data[data.length - i - 1];
             data[data.length - i - 1] = temp;
         }

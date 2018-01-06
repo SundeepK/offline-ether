@@ -1,6 +1,8 @@
 package com.example.sundeep.offline_ether.activities;
 
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -19,7 +21,6 @@ import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.adapters.TransactionsAdapter;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
-import com.example.sundeep.offline_ether.blockies.Blockies;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.entities.EtherAddress_;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
@@ -32,7 +33,6 @@ import java.util.List;
 import io.objectbox.Box;
 import io.objectbox.android.AndroidScheduler;
 import io.objectbox.reactive.DataSubscription;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
@@ -63,7 +63,6 @@ public class AccountActivity extends AppCompatActivity {
         TextView addressTextView = findViewById(R.id.address_textview);
         FloatingActionButton fab = findViewById(R.id.new_offline_transaction);
 
-        addressPhoto.setImageBitmap(Blockies.createIcon(address, new Blockies.BlockiesOpts(20, 0, 0)));
         addressTextView.setText(address);
 
         LinearLayoutManager layoutManager = new LinearLayoutManager(this);
@@ -79,6 +78,11 @@ public class AccountActivity extends AppCompatActivity {
         addressRepository = new AddressRepository(addressboxStore);
 
         etherAddress = addressRepository.findOne(address);
+
+        byte[] blockie = etherAddress.getBlockie();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(blockie, 0, blockie.length);
+        addressPhoto.setImageBitmap(bitmap);
+
         balanceTextView.setText(EtherMath.weiAsEtherStr(etherAddress.getBalance()));
         etherTransactionsList.addAll(etherAddress.getEtherTransactions());
 
@@ -137,7 +141,6 @@ public class AccountActivity extends AppCompatActivity {
 
     private void loadLast50Transactions() {
         etherApi.getTransactions(address, 1)
-                .observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
                 .subscribe(balances -> saveAddress(balances, etherAddress), e -> Log.e(TAG, "Error fetching transactions", e));
     }

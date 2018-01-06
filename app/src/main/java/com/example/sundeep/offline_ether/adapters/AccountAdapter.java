@@ -1,5 +1,7 @@
 package com.example.sundeep.offline_ether.adapters;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -9,7 +11,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.R;
-import com.example.sundeep.offline_ether.blockies.Blockies;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.utils.EtherMath;
 
@@ -49,7 +50,9 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.EtherAdd
         EtherAddress etherAddress = etherAddresses.get(i);
         viewHolder.address.setText(etherAddress.getAddress());
         viewHolder.balance.setText(EtherMath.weiAsEtherStr(etherAddress.getBalance()));
-        viewHolder.addressPhoto.setImageBitmap(Blockies.createIcon(etherAddress.getAddress(), new Blockies.BlockiesOpts(30, 10, 10)));
+        byte[] blockie = etherAddress.getBlockie();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(blockie, 0, blockie.length);
+        viewHolder.addressPhoto.setImageBitmap(bitmap);
     }
 
     public static class EtherAddressViewHolder extends RecyclerView.ViewHolder {

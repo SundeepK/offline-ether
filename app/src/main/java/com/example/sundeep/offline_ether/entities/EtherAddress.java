@@ -1,5 +1,7 @@
 package com.example.sundeep.offline_ether.entities;
 
+import java.util.Arrays;
+
 import io.objectbox.annotation.Backlink;
 import io.objectbox.annotation.Entity;
 import io.objectbox.annotation.Id;
@@ -17,6 +19,8 @@ public class EtherAddress {
 
     String balance;
 
+    byte[] blockie;
+
     @Backlink
     ToMany<EtherTransaction> etherTransactions;
 
@@ -32,6 +36,7 @@ public class EtherAddress {
         id = builder.id;
         address = builder.address;
         balance = builder.balance;
+        blockie = builder.blockie;
         etherTransactions = builder.etherTransactions;
     }
 
@@ -44,6 +49,7 @@ public class EtherAddress {
         builder.id = copy.getId();
         builder.address = copy.getAddress();
         builder.balance = copy.getBalance();
+        builder.blockie = copy.getBlockie();
         builder.etherTransactions = copy.getEtherTransactions();
         return builder;
     }
@@ -74,6 +80,10 @@ public class EtherAddress {
                 '}';
     }
 
+    public byte[] getBlockie() {
+        return blockie;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -84,6 +94,7 @@ public class EtherAddress {
         if (id != that.id) return false;
         if (address != null ? !address.equals(that.address) : that.address != null) return false;
         if (balance != null ? !balance.equals(that.balance) : that.balance != null) return false;
+        if (!Arrays.equals(blockie, that.blockie)) return false;
         return etherTransactions != null ? etherTransactions.equals(that.etherTransactions) : that.etherTransactions == null;
     }
 
@@ -92,6 +103,7 @@ public class EtherAddress {
         int result = (int) (id ^ (id >>> 32));
         result = 31 * result + (address != null ? address.hashCode() : 0);
         result = 31 * result + (balance != null ? balance.hashCode() : 0);
+        result = 31 * result + Arrays.hashCode(blockie);
         result = 31 * result + (etherTransactions != null ? etherTransactions.hashCode() : 0);
         return result;
     }
@@ -100,6 +112,7 @@ public class EtherAddress {
         private long id;
         private String address;
         private String balance;
+        private byte[] blockie;
         private ToMany<EtherTransaction> etherTransactions;
 
         private Builder() {
@@ -117,6 +130,11 @@ public class EtherAddress {
 
         public Builder setBalance(String val) {
             balance = val;
+            return this;
+        }
+
+        public Builder setBlockie(byte[] val) {
+            blockie = val;
             return this;
         }
 

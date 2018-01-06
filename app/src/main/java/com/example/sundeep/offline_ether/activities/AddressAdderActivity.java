@@ -1,5 +1,6 @@
 package com.example.sundeep.offline_ether.activities;
 
+import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
@@ -7,11 +8,13 @@ import android.util.Log;
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
+import com.example.sundeep.offline_ether.blockies.Blockies;
 import com.example.sundeep.offline_ether.entities.Balance;
 import com.example.sundeep.offline_ether.entities.Balances;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.objectbox.AddressRepository;
 
+import java.io.ByteArrayOutputStream;
 import java.util.Collections;
 import java.util.List;
 
@@ -44,8 +47,7 @@ public class AddressAdderActivity extends AppCompatActivity {
 
         balance.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .doOnError(e -> Log.e(TAG, "Error fetching balances", e))
-                .subscribe(balances -> saveAddress(balances.getResult(), address));
+                .subscribe(balances -> saveAddress(balances.getResult(), address), e -> Log.e(TAG, "Error fetching balances", e));
 
     }
 
@@ -55,20 +57,34 @@ public class AddressAdderActivity extends AppCompatActivity {
             finish();
         }
         EtherAddress existingAddress = addressRepository.findOne(address);
-        EtherAddress newAddress = new EtherAddress(address, balances.get(0).getBalance().toString());
+        byte[] blockieArray = getBlockie(address);
 
         if (existingAddress == null) {
+            EtherAddress newAddress = EtherAddress.newBuilder()
+                    .setAddress(address)
+                    .setBalance(balances.get(0).getBalance())
+                    .setBlockie(blockieArray)
+                    .build();
+
             addressRepository.put(newAddress);
             Log.d(TAG, "Added new address " + newAddress);
             finish();
         } else {
             EtherAddress addressToSave = EtherAddress.newBuilder(existingAddress)
                     .setBalance(balances.get(0).getBalance().toString())
+                    .setBlockie(blockieArray)
                     .build();
             addressRepository.put(addressToSave);
             Log.d(TAG, "Address already exists " + existingAddress);
             finish();
         }
+    }
+
+    private byte[] getBlockie(String address) {
+        Bitmap blockie = Blockies.createIcon(address, new Blockies.BlockiesOpts(6, 2, 2));
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        blockie.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
     }
 
 

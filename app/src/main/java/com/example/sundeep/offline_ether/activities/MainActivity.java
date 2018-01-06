@@ -9,7 +9,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
@@ -119,7 +118,7 @@ public class MainActivity extends AppCompatActivity {
             public void onItemClick(View view, int position) {
                 ImageView img = view.findViewById(R.id.address_photo);
                 ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this,
-                                new Pair<>(img, ViewCompat.getTransitionName(img)));
+                                img, ViewCompat.getTransitionName(img));
                 Intent intent = new Intent(MainActivity.this.getApplicationContext(), AccountActivity.class);
                 intent.putExtra(PUBLIC_ADDRESS, addressList.get(position).getAddress());
                 startActivity(intent, options.toBundle());
