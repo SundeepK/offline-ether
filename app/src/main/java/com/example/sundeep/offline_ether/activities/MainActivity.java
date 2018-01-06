@@ -11,28 +11,28 @@ import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.util.Pair;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.ImageButton;
 import android.widget.ImageView;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.adapters.AccountAdapter;
+import com.example.sundeep.offline_ether.adapters.BalanceSlidePagerAdapter;
 import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.Balance;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
-import com.example.sundeep.offline_ether.utils.EtherMath;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,57 +55,118 @@ public class MainActivity extends AppCompatActivity {
     private DataSubscription observer;
     private List<EtherAddress> addressList = new ArrayList<>();
     private AccountAdapter adapter;
+    private FloatingActionButton fab;
+    private RecyclerView addressRecyclerView;
+    private ViewPager balanceViewPager;
+    private ImageButton nextCurrency;
+    private ImageButton previousCurrency;
+    private Box<EtherAddress> boxStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
         // set views
-        FloatingActionButton fab = findViewById(R.id.fab);
-        RecyclerView addressRecyclerView = findViewById(R.id.address_recycler_view);
-        TextView balanceTextView = findViewById(R.id.balance);
+        fab = findViewById(R.id.fab);
+        addressRecyclerView = findViewById(R.id.address_recycler_view);
+        balanceViewPager = findViewById(R.id.balance);
+        nextCurrency = findViewById(R.id.next_currency_button);
+        previousCurrency = findViewById(R.id.previous_currency_button);
+        previousCurrency.setVisibility(View.GONE);
+        boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        addressRecyclerView.setLayoutManager(layoutManager);
+        balanceViewPager.addOnPageChangeListener(onPageScrolled());
+        nextCurrency.setOnClickListener(showFiatValue());
+        previousCurrency.setOnClickListener(showEtherValue());
 
-        adapter = new AccountAdapter(addressList);
-        addressRecyclerView.setAdapter(adapter);
-        addressRecyclerView.addOnItemTouchListener(
-                new RecyclerItemClickListener(this.getApplicationContext(), addressRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-                    @Override
-                    public void onItemClick(View view, int position) {
-                        ImageView img = view.findViewById(R.id.address_photo);
-                        ActivityOptionsCompat options = ActivityOptionsCompat.
-                                makeSceneTransitionAnimation(MainActivity.this,
-                                        new Pair<>(img, ViewCompat.getTransitionName(img))
-                                        );
-                        Intent intent = new Intent(MainActivity.this.getApplicationContext(), AccountActivity.class);
-                        intent.putExtra(PUBLIC_ADDRESS, addressList.get(position).getAddress());
-                        startActivity(intent, options.toBundle());
-                    }
+        setUpBalanceViewPager();
 
-                    @Override
-                    public void onLongItemClick(View view, int position) {
-                    }
-                })
-        );
+        setUpAddressRecyclerView();
 
+        observeAddressChanges();
 
-        final Box<EtherAddress> boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
+        fab.setOnClickListener(view -> launchActivity(AddressScannerActivity.class));
+
+        findAndUpdateBalances(boxStore.query().build());
+    }
+
+    @NonNull
+    private Box<EtherAddress> observeAddressChanges() {
         Query<EtherAddress> addressQuery = boxStore.query().build();
         observer = addressQuery
                 .subscribe()
                 .on(AndroidScheduler.mainThread())
-                .observer(onDataChanged(balanceTextView));
+                .observer(onDataChanged());
+        return boxStore;
+    }
 
-        fab.setOnClickListener(new View.OnClickListener() {
+    private void setUpBalanceViewPager() {
+        BalanceSlidePagerAdapter screenSlidePagerAdapter = new BalanceSlidePagerAdapter(getSupportFragmentManager());
+        balanceViewPager.setAdapter(screenSlidePagerAdapter);
+    }
+
+    private void setUpAddressRecyclerView() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        addressRecyclerView.setLayoutManager(layoutManager);
+        adapter = new AccountAdapter(addressList);
+        addressRecyclerView.setAdapter(adapter);
+        addressRecyclerView.addOnItemTouchListener(showAccountOnClick());
+    }
+
+    @NonNull
+    private RecyclerItemClickListener showAccountOnClick() {
+        return new RecyclerItemClickListener(this.getApplicationContext(), addressRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
-            public void onClick(View view) {
-                launchActivity(AddressScannerActivity.class);
+            public void onItemClick(View view, int position) {
+                ImageView img = view.findViewById(R.id.address_photo);
+                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this,
+                                new Pair<>(img, ViewCompat.getTransitionName(img)));
+                Intent intent = new Intent(MainActivity.this.getApplicationContext(), AccountActivity.class);
+                intent.putExtra(PUBLIC_ADDRESS, addressList.get(position).getAddress());
+                startActivity(intent, options.toBundle());
+            }
+
+            @Override
+            public void onLongItemClick(View view, int position) {
             }
         });
+    }
 
-        findAndUpdateBalances(boxStore.query().build());
+    @NonNull
+    private ViewPager.OnPageChangeListener onPageScrolled() {
+        return new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if (position == 0) {
+                    nextCurrency.setVisibility(View.VISIBLE);
+                    previousCurrency.setVisibility(View.GONE);
+                } else {
+                    nextCurrency.setVisibility(View.GONE);
+                    previousCurrency.setVisibility(View.VISIBLE);
+                }
+            }
+
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        };
+    }
+
+    @NonNull
+    private View.OnClickListener showEtherValue() {
+        return v -> balanceViewPager.setCurrentItem(0);
+    }
+
+    @NonNull
+    private View.OnClickListener showFiatValue() {
+        return v -> balanceViewPager.setCurrentItem(1);
     }
 
     private void findAndUpdateBalances(Query<EtherAddress> addressQuery) {
@@ -132,7 +193,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     @NonNull
-    private DataObserver<List<EtherAddress>> onDataChanged(TextView balanceTextView) {
+    private DataObserver<List<EtherAddress>> onDataChanged() {
         return new DataObserver<List<EtherAddress>>() {
             @Override
             public void onData(List<EtherAddress> newAddresses) {
@@ -145,19 +206,10 @@ public class MainActivity extends AppCompatActivity {
                     addressList.clear();
                     addressList.addAll(newAddresses);
                     Log.d(TAG, "addressList:" + addressList);
-                    balanceTextView.setText(calculateBalance());
                     adapter.notifyDataSetChanged();
                 }
             }
         };
-    }
-
-    private String calculateBalance() {
-        BigDecimal balance = new BigDecimal("0");
-        for(EtherAddress address: addressList){
-            balance = balance.add(new BigDecimal(address.getBalance()));
-        }
-        return EtherMath.weiAsEtherStr(balance);
     }
 
     public void launchActivity(Class<?> clss) {

@@ -96,9 +96,29 @@
         }
       ],
       "relations": []
+    },
+    {
+      "id": "3:3495563762899305400",
+      "lastPropertyId": "3:8235090267757269200",
+      "name": "Price",
+      "properties": [
+        {
+          "id": "1:3358724011822341859",
+          "name": "id"
+        },
+        {
+          "id": "2:132598556828994399",
+          "name": "code"
+        },
+        {
+          "id": "3:8235090267757269200",
+          "name": "price"
+        }
+      ],
+      "relations": []
     }
   ],
-  "lastEntityId": "2:6696083212557257440",
+  "lastEntityId": "3:3495563762899305400",
   "lastIndexId": "2:5033216130226524411",
   "lastRelationId": "0:0",
   "lastSequenceId": "0:0",

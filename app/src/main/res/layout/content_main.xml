@@ -8,27 +8,47 @@
     tools:context="com.example.sundeep.offline_ether.activities.MainActivity"
     tools:showIn="@layout/activity_main">
 
-    <TextView
-        android:id="@+id/balance"
+    <RelativeLayout
+        android:id="@+id/balance_container"
         android:layout_width="match_parent"
-        android:layout_height="100dp"
-        android:gravity="center"
-        android:paddingLeft="20dp"
-        android:paddingRight="20dp"
-        android:paddingTop="20dp"
-        android:textColor="@color/colorHeader"
-        android:textSize="24sp"
-        android:background="@color/colorPrimaryDark"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        />
+        android:layout_height="wrap_content">
+
+        <android.support.v4.view.ViewPager
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/balance"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:background="@color/colorPrimaryDark"
+            />
+
+        <ImageButton
+            android:id="@+id/next_currency_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_alignParentRight="true"
+            android:padding="10dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@mipmap/ic_keyboard_arrow_right_white_24dp"
+            />
+
+        <ImageButton
+            android:id="@+id/previous_currency_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:padding="10dp"
+            android:background="@android:color/transparent"
+            app:srcCompat="@mipmap/ic_keyboard_arrow_left_white_24dp" />
+
+    </RelativeLayout>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/address_recycler_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:scrollbars="vertical"
-        app:layout_constraintTop_toBottomOf="@+id/balance"
+        app:layout_constraintTop_toBottomOf="@+id/balance_container"
         />
 
 

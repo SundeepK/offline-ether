@@ -12,9 +12,14 @@ import com.example.sundeep.offline_ether.entities.SentTransaction;
 import com.google.common.base.Joiner;
 import com.squareup.moshi.JsonAdapter;
 import com.squareup.moshi.Moshi;
+import com.squareup.moshi.Types;
 
+import java.lang.reflect.Type;
 import java.util.Collection;
+import java.util.Currency;
 import java.util.List;
+import java.util.Locale;
+import java.util.Map;
 
 import io.reactivex.Observable;
 import okhttp3.HttpUrl;
@@ -24,6 +29,7 @@ public class EtherApi {
 
     private final static String TAG = "EtherApiScan";
     private HttpUrl ethGasApi = HttpUrl.parse("https://ethgasstation.info/json/ethgasAPI.json");
+    private HttpUrl price;
     private RestClient restClient;
     private String apiEndpoint;
     private Moshi moshi;
@@ -32,6 +38,9 @@ public class EtherApi {
         this.restClient = restClient;
         this.apiEndpoint = apiEndpoint;
         this.moshi = new Moshi.Builder().add(new EtherTransaction.EtherTransactionAdapter()).build();
+        Currency currency = Currency.getInstance(Locale.getDefault());
+        String currencyCode = currency.getCurrencyCode();
+        this.price = HttpUrl.parse("https://min-api.cryptocompare.com/data/price?fsym=ETH&tsyms=BTC,USD,EUR,GBP," + currencyCode);
     }
 
     public Observable<Balances> getBalance(Collection<String> addresses){
@@ -43,6 +52,15 @@ public class EtherApi {
             Log.d(TAG, "balanceReq " + balanceReq.url().toString());
             JsonAdapter<Balances> jsonAdapter = moshi.adapter(Balances.class);
             return restClient.executeGet(balanceReq, jsonAdapter);
+        });
+    }
+
+    public Observable<Map<String, String>> getPrices(){
+        return Observable.fromCallable(() -> {
+            Request req = new Request.Builder().url(price).build();
+            Type type = Types.newParameterizedType(Map.class, String.class, String.class);
+            JsonAdapter<Map<String,String>> adapter = moshi.adapter(type);
+            return restClient.executeGet(req, adapter);
         });
     }
 
