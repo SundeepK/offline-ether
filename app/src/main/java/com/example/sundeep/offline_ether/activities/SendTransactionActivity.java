@@ -8,7 +8,6 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.R;
-import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.SentTransaction;
 
@@ -17,7 +16,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 import mehdi.sakout.fancybuttons.FancyButton;
-import okhttp3.OkHttpClient;
 
 import static com.example.sundeep.offline_ether.Constants.SIGNED_TRANSACTION;
 
@@ -45,8 +43,8 @@ public class SendTransactionActivity extends AppCompatActivity {
         okButton.setVisibility(View.GONE);
 
         String transaction = getIntent().getStringExtra(SIGNED_TRANSACTION);
-        String etherScanHost = getResources().getString(R.string.etherScanHost);
-        etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
+
+        etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
         okButton.setOnClickListener(view -> SendTransactionActivity.this.finish());
         sendButton.setOnClickListener(view -> sendTransaction(transaction));
 

@@ -17,12 +17,14 @@ import com.squareup.moshi.Types;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Currency;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import io.reactivex.Observable;
 import okhttp3.HttpUrl;
+import okhttp3.OkHttpClient;
 import okhttp3.Request;
 
 public class EtherApi {
@@ -33,6 +35,14 @@ public class EtherApi {
     private RestClient restClient;
     private String apiEndpoint;
     private Moshi moshi;
+    private static Map<String, EtherApi> etherApiMap = new HashMap<>();
+
+    public static synchronized EtherApi getEtherApi(String host){
+        if(!etherApiMap.containsKey(host)){
+            etherApiMap.put(host, new EtherApi(new RestClient(new OkHttpClient()), host));
+        }
+        return etherApiMap.get(host);
+    }
 
     public EtherApi(RestClient restClient, String apiEndpoint) {
         this.restClient = restClient;

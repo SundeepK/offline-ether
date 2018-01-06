@@ -8,7 +8,7 @@ import android.util.Log;
 import android.util.Pair;
 
 import com.example.sundeep.offline_ether.App;
-import com.example.sundeep.offline_ether.api.RestClient;
+import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
@@ -24,7 +24,6 @@ import io.objectbox.Box;
 import io.objectbox.reactive.DataSubscription;
 import io.reactivex.Observable;
 import io.reactivex.functions.Function;
-import okhttp3.OkHttpClient;
 
 public class TransactionPoller extends IntentService {
 
@@ -37,7 +36,6 @@ public class TransactionPoller extends IntentService {
     public TransactionPoller() {
         super("TransactionPoller");
     }
-
 
     @Override
     public void onDestroy() {
@@ -55,8 +53,8 @@ public class TransactionPoller extends IntentService {
 
     @Override
     protected void onHandleIntent(@Nullable Intent intent) {
-        String etherScanHost = intent.getStringExtra("etherScanApi");
-        etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
+        etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
+
         boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
         addressQuery = boxStore.query().build()
                 .subscribe()

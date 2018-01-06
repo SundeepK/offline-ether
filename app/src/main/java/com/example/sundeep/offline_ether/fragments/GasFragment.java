@@ -16,7 +16,6 @@ import android.view.ViewGroup;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.activities.RecyclerItemClickListener;
 import com.example.sundeep.offline_ether.adapters.GasPricesAdapter;
-import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.EthGas;
 import com.example.sundeep.offline_ether.entities.EthGasAndNonce;
@@ -31,7 +30,6 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.OkHttpClient;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 
@@ -117,8 +115,7 @@ public class GasFragment extends Fragment {
 
         String address = getArguments().getString(PUBLIC_ADDRESS);
 
-        String etherScanHost = getResources().getString(R.string.etherScanHost);
-        EtherApi etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
+        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
         Observable<EthGas> ethgas = etherApi.getEthgas();
         Observable<Nonce> nonce = etherApi.getNonce(address);
 

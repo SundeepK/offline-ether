@@ -6,11 +6,10 @@ import android.util.Log;
 
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
-import com.example.sundeep.offline_ether.api.RestClient;
+import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.Balance;
 import com.example.sundeep.offline_ether.entities.Balances;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
-import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.objectbox.AddressRepository;
 
 import java.util.Collections;
@@ -20,7 +19,6 @@ import io.objectbox.Box;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.OkHttpClient;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 
@@ -34,8 +32,8 @@ public class AddressAdderActivity extends AppCompatActivity {
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.address_adder);
-        String etherScanHost = getResources().getString(R.string.etherScanHost);
-        EtherApi etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
+
+        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
         String address = getIntent().getStringExtra(PUBLIC_ADDRESS);
         Log.d(TAG, "Started with" + address);
 

@@ -11,7 +11,6 @@ import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
-import com.example.sundeep.offline_ether.api.RestClient;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.utils.EtherMath;
@@ -34,7 +33,6 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.functions.Consumer;
 import io.reactivex.schedulers.Schedulers;
-import okhttp3.OkHttpClient;
 
 public class BalanceCurrency extends Fragment {
 
@@ -54,8 +52,7 @@ public class BalanceCurrency extends Fragment {
         balance = rootView.findViewById(R.id.balance_textView);
         balance.setText("-");
 
-        String etherScanHost = getResources().getString(R.string.etherScanHost);
-        etherApi = new EtherApi(new RestClient(new OkHttpClient()), etherScanHost);
+        etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
 
         boxStore = ((App) getActivity().getApplication()).getBoxStore().boxFor(EtherAddress.class);
         return rootView;
