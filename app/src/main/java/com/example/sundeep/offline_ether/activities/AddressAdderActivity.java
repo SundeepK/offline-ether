@@ -4,6 +4,8 @@ import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
+import android.view.View;
+import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
@@ -22,6 +24,7 @@ import io.objectbox.Box;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
+import mehdi.sakout.fancybuttons.FancyButton;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 
@@ -30,11 +33,18 @@ public class AddressAdderActivity extends AppCompatActivity {
     private final static String TAG = "AddressAdder";
 
     private AddressRepository addressRepository;
+    private TextView status;
+    private FancyButton okButton;
 
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.address_adder);
+
+        status = findViewById(R.id.status_message);
+        okButton = findViewById(R.id.ok_button);
+
+        okButton.setOnClickListener(v -> finish());
 
         EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
         String address = getIntent().getStringExtra(PUBLIC_ADDRESS);
@@ -47,8 +57,15 @@ public class AddressAdderActivity extends AppCompatActivity {
 
         balance.observeOn(AndroidSchedulers.mainThread())
                 .subscribeOn(Schedulers.io())
-                .subscribe(balances -> saveAddress(balances.getResult(), address), e -> Log.e(TAG, "Error fetching balances", e));
+                .subscribe(balances -> saveAddress(balances.getResult(), address), this::handleBalanceError);
 
+    }
+
+    private void handleBalanceError(Throwable e) {
+        Log.e(TAG, "Error fetching balances", e);
+        status.setVisibility(View.VISIBLE);
+        status.setText("Unable to save address. Check network.");
+        okButton.setVisibility(View.VISIBLE);
     }
 
     private void saveAddress(List<Balance> balances, String address) {

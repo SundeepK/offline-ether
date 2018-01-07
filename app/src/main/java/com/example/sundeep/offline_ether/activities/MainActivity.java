@@ -173,8 +173,7 @@ public class MainActivity extends AppCompatActivity {
         ImmutableMap<String, EtherAddress> addressToEtherAccount = Maps.uniqueIndex(etherAddresses, EtherAddress::getAddress);
         etherApi.getBalance(addressToEtherAccount.keySet())
                 .subscribeOn(Schedulers.io())
-                .doOnError(err -> Log.e(TAG, "Error occurred while updating balance", err))
-                .subscribe(balances -> updateBalances(addressToEtherAccount, balances.getResult()));
+                .subscribe(balances -> updateBalances(addressToEtherAccount, balances.getResult()), err -> Log.e(TAG, "Error occurred while updating balance", err));
     }
 
     private void updateBalances(Map<String, EtherAddress> addressToEtherAccount, List<Balance> balances) {

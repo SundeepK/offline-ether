@@ -2,6 +2,7 @@ package com.example.sundeep.offline_ether.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.NonNull;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -91,7 +92,13 @@ public class BalanceCurrency extends Fragment {
             getPrices()
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeOn(Schedulers.io())
-                    .subscribe(convertEtherPriceToFiat(ether), e -> Log.e(TAG, "Error fetching prices", e));
+                    .subscribe(convertEtherPriceToFiat(ether), this::handlePriceQueryError);
+    }
+
+    private void handlePriceQueryError(Throwable e) {
+        View viewById = getActivity().findViewById(R.id.main_container);
+        Snackbar.make(viewById, "Unable to fetch price updates. Check Network.", Snackbar.LENGTH_LONG).show();
+        Log.e(TAG, "Error fetching prices ", e);
     }
 
     private Observable<Map<String, String>> getPrices() {

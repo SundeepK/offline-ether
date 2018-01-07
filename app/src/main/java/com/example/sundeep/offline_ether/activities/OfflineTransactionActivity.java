@@ -116,7 +116,10 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
                 btnBack.setVisibility(View.GONE);
             } else {
                 if(position == 1){
+                    btnNext.setVisibility(View.VISIBLE);
                     btnNext.setText("Scan QR");
+                } else if (position > 1) {
+                    btnNext.setVisibility(View.GONE);
                 }
                 btnBack.setVisibility(View.VISIBLE);
             }

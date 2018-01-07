@@ -68,7 +68,7 @@ public class SendTransactionActivity extends AppCompatActivity {
                         if (sentTransaction.getError() != null) {
                             sendButton.setText("Retry");
                             sendButton.setVisibility(View.VISIBLE);
-                            message.setText(sentTransaction.getError().getMessage());
+                            message.setText("Error occurred sending transaction. \n" + sentTransaction.getError().getMessage());
                         } else {
                             okButton.setVisibility(View.VISIBLE);
                             message.setText("Transaction successfully sent.");
@@ -79,6 +79,10 @@ public class SendTransactionActivity extends AppCompatActivity {
                     @Override
                     public void onError(Throwable e) {
                         Log.e(TAG, "Error sending transactions", e);
+                        progressBar.setVisibility(View.GONE);
+                        sendButton.setText("Retry");
+                        sendButton.setVisibility(View.VISIBLE);
+                        message.setText("Error occurred sending transaction. \nCheck network settings." );
                     }
 
                     @Override

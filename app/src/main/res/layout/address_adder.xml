@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<RelativeLayout
+    xmlns:fancy="http://schemas.android.com/apk/res-auto"
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
@@ -9,7 +10,30 @@
     <TextView
         android:id="@+id/status_message"
         android:layout_width="wrap_content"
-        android:textSize="20sp"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:layout_centerHorizontal="true"
+        android:visibility="gone"
+        android:layout_margin="20dp"
+        android:textColor="#FBFBFB"
+        android:textSize="24sp"
+        android:text="TextView" />
 
-</LinearLayout>
+    <mehdi.sakout.fancybuttons.FancyButton
+        android:visibility="gone"
+        android:id="@+id/ok_button"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        fancy:fb_textColor="#494949"
+        fancy:fb_radius="30dp"
+        fancy:fb_defaultColor="#EEEEEE"
+        fancy:fb_focusColor="#5D5D5D"
+        android:padding="15dp"
+        android:layout_margin="10dp"
+        fancy:fb_textSize="16sp"
+        fancy:fb_disabledColor="#5D5D5D"
+        android:text="OK"
+        />
+
+</RelativeLayout>
