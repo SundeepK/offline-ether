@@ -7,6 +7,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
@@ -142,7 +143,13 @@ public class AccountActivity extends AppCompatActivity {
     private void loadLast50Transactions() {
         etherApi.getTransactions(address, 1)
                 .subscribeOn(Schedulers.io())
-                .subscribe(balances -> saveAddress(balances, etherAddress), e -> Log.e(TAG, "Error fetching transactions", e));
+                .subscribe(balances -> saveAddress(balances, etherAddress), e -> handleError(e));
+    }
+
+    private int handleError(Throwable e) {
+        View viewById = findViewById(R.id.main_container);
+        Snackbar.make(viewById, "Unable to fetch transactions. Check Network.", Snackbar.LENGTH_LONG).show();
+        return Log.e(TAG, "Error fetching transactions", e);
     }
 
     private void saveAddress(List<EtherTransaction> transactions, EtherAddress address) {
