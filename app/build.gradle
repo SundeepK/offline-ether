@@ -1,3 +1,15 @@
+buildscript {
+    ext {
+        osName = System.getProperty("os.name").toLowerCase()
+        isLinux = osName.contains("linux")
+        isWindows = osName.contains("windows")
+        is64 = System.getProperty("sun.arch.data.model") == "64"
+        isLinux64 = isLinux && is64
+        isWindows64 = isWindows && is64
+    }
+
+}
+
 apply plugin: 'com.android.application'
 apply plugin: 'io.objectbox'
 
@@ -21,6 +33,11 @@ android {
             resValue 'string', 'etherScanHost', '"rinkeby.etherscan.io"'
         }
     }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -47,4 +64,14 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.1'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.1'
+
+    if (isLinux64) {
+        compile "io.objectbox:objectbox-linux:$objectboxVersion"
+    } else if (isWindows64) {
+        compile "io.objectbox:objectbox-windows:$objectboxVersion"
+    } else println("Native dependency could not be set up for unsupported OS: " + osName)
+
+    testCompile 'org.mockito:mockito-core:1.10.19'
+    testCompile 'junit:junit:4.12'
+
 }
