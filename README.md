@@ -4,7 +4,8 @@ App which allows users to sign transactions from an air gap computer. It works b
 
 ![ScreenShot](https://github.com/SundeepK/offline-ether/blob/master/screenshots/device-2018-01-30-225109.png)
 
+![ScreenShot](https://github.com/SundeepK/offline-ether/blob/master/screenshots/device-2018-01-30-224927.png)
+
 ![ScreenShot](https://github.com/SundeepK/offline-ether/blob/master/screenshots/device-2018-01-30-225140.png)
 
-![ScreenShot](https://github.com/SundeepK/offline-ether/blob/master/screenshots/device-2018-01-30-224927.png)
 
