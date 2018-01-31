@@ -31,7 +31,7 @@ public class BalanceEther extends Fragment {
                              Bundle savedInstanceState) {
 
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.balance, container, false);
-       balance = rootView.findViewById(R.id.balance_textView);
+        balance = rootView.findViewById(R.id.balance_textView);
 
         final Box<EtherAddress> boxStore = ((App) getActivity().getApplication()).getBoxStore().boxFor(EtherAddress.class);
         Query<EtherAddress> addressQuery = boxStore.query().build();
