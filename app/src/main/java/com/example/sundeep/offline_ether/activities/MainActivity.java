@@ -7,9 +7,7 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
-import android.support.v4.app.ActivityOptionsCompat;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.view.ViewCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -18,33 +16,25 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.View;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.Toast;
 
+import com.example.sundeep.offline_ether.AddressRecyclerItemListener;
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.adapters.AccountAdapter;
 import com.example.sundeep.offline_ether.adapters.BalanceSlidePagerAdapter;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
-import com.example.sundeep.offline_ether.entities.Balance;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
+import com.example.sundeep.offline_ether.mvc.presenters.MainPresenter;
+import com.example.sundeep.offline_ether.mvc.views.MainView;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import io.objectbox.Box;
-import io.objectbox.android.AndroidScheduler;
-import io.objectbox.query.Query;
-import io.objectbox.reactive.DataObserver;
 import io.objectbox.reactive.DataSubscription;
-import io.reactivex.schedulers.Schedulers;
 
-import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
-
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MainView {
 
     private final static String TAG = "MainActivity";
     private static final int ZXING_CAMERA_PERMISSION = 1;
@@ -58,6 +48,7 @@ public class MainActivity extends AppCompatActivity {
     private ImageButton nextCurrency;
     private ImageButton previousCurrency;
     private Box<EtherAddress> boxStore;
+    private MainPresenter mainPresenter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -81,21 +72,17 @@ public class MainActivity extends AppCompatActivity {
 
         setUpAddressRecyclerView();
 
-        observeAddressChanges();
-
         fab.setOnClickListener(view -> launchActivity(AddressScannerActivity.class));
 
-        findAndUpdateBalances(boxStore.query().build());
+        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
+        mainPresenter = new MainPresenter(etherApi, boxStore, this);
+
     }
 
-    @NonNull
-    private Box<EtherAddress> observeAddressChanges() {
-        Query<EtherAddress> addressQuery = boxStore.query().build();
-        observer = addressQuery
-                .subscribe()
-                .on(AndroidScheduler.mainThread())
-                .observer(onDataChanged());
-        return boxStore;
+    @Override
+    protected void onResume() {
+        super.onResume();
+        mainPresenter.loadBalances();
     }
 
     private void setUpBalanceViewPager() {
@@ -113,21 +100,9 @@ public class MainActivity extends AppCompatActivity {
 
     @NonNull
     private RecyclerItemClickListener showAccountOnClick() {
-        return new RecyclerItemClickListener(this.getApplicationContext(), addressRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
-            @Override
-            public void onItemClick(View view, int position) {
-                ImageView img = view.findViewById(R.id.address_photo);
-                ActivityOptionsCompat options = ActivityOptionsCompat.makeSceneTransitionAnimation(MainActivity.this,
-                                img, ViewCompat.getTransitionName(img));
-                Intent intent = new Intent(MainActivity.this.getApplicationContext(), AccountActivity.class);
-                intent.putExtra(PUBLIC_ADDRESS, addressList.get(position).getAddress());
-                startActivity(intent, options.toBundle());
-            }
-
-            @Override
-            public void onLongItemClick(View view, int position) {
-            }
-        });
+        return new RecyclerItemClickListener(this.getApplicationContext(),
+                addressRecyclerView,
+                new AddressRecyclerItemListener(this, addressList));
     }
 
     @NonNull
@@ -166,47 +141,6 @@ public class MainActivity extends AppCompatActivity {
         return v -> balanceViewPager.setCurrentItem(1);
     }
 
-    private void findAndUpdateBalances(Query<EtherAddress> addressQuery) {
-        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
-
-        List<EtherAddress> etherAddresses = addressQuery.find();
-        ImmutableMap<String, EtherAddress> addressToEtherAccount = Maps.uniqueIndex(etherAddresses, EtherAddress::getAddress);
-        etherApi.getBalance(addressToEtherAccount.keySet())
-                .subscribeOn(Schedulers.io())
-                .subscribe(balances -> updateBalances(addressToEtherAccount, balances.getResult()), err -> Log.e(TAG, "Error occurred while updating balance", err));
-    }
-
-    private void updateBalances(Map<String, EtherAddress> addressToEtherAccount, List<Balance> balances) {
-        final Box<EtherAddress> boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
-        for (Balance balance : balances) {
-            EtherAddress address = addressToEtherAccount.get(balance.getAccount());
-            EtherAddress newAccount = EtherAddress.newBuilder(address)
-                    .setBalance(balance.getBalance())
-                    .build();
-            boxStore.put(newAccount);
-        }
-    }
-
-    @NonNull
-    private DataObserver<List<EtherAddress>> onDataChanged() {
-        return new DataObserver<List<EtherAddress>>() {
-            @Override
-            public void onData(List<EtherAddress> newAddresses) {
-                Log.d(TAG, "Found address on update:" + newAddresses.toString());
-                View noAddressMessage = findViewById(R.id.no_address_message);
-                if (newAddresses.isEmpty()) {
-                    noAddressMessage.setVisibility(View.VISIBLE);
-                } else {
-                    noAddressMessage.setVisibility(View.GONE);
-                    addressList.clear();
-                    addressList.addAll(newAddresses);
-                    Log.d(TAG, "addressList:" + addressList);
-                    adapter.notifyDataSetChanged();
-                }
-            }
-        };
-    }
-
     public void launchActivity(Class<?> clss) {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -242,4 +176,23 @@ public class MainActivity extends AppCompatActivity {
         return true;
     }
 
+    @Override
+    public void loadBalances(List<EtherAddress> newAddresses) {
+        Log.d(TAG, "Found address on update:" + newAddresses.toString());
+        View noAddressMessage = findViewById(R.id.no_address_message);
+        if (newAddresses.isEmpty()) {
+            noAddressMessage.setVisibility(View.VISIBLE);
+        } else {
+            noAddressMessage.setVisibility(View.GONE);
+            addressList.clear();
+            addressList.addAll(newAddresses);
+            Log.d(TAG, "addressList:" + addressList);
+            adapter.notifyDataSetChanged();
+        }
+    }
+
+    @Override
+    public void onAccountLoadError(Throwable t) {
+        Log.e(TAG, "Error occurred while updating balance", t);
+    }
 }
