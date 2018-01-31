@@ -23,33 +23,33 @@ import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.adapters.TransactionsAdapter;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
-import com.example.sundeep.offline_ether.entities.EtherAddress_;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
-import com.example.sundeep.offline_ether.objectbox.AddressRepository;
+import com.example.sundeep.offline_ether.mvc.presenters.AccountPresenter;
+import com.example.sundeep.offline_ether.mvc.views.AccountView;
 import com.example.sundeep.offline_ether.utils.EtherMath;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import io.objectbox.Box;
-import io.objectbox.android.AndroidScheduler;
-import io.objectbox.reactive.DataSubscription;
-import io.reactivex.schedulers.Schedulers;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 
-public class AccountActivity extends AppCompatActivity {
+public class AccountActivity extends AppCompatActivity implements AccountView {
 
     private final static String TAG = "AccountActivity";
 
-    private AddressRepository addressRepository;
-    private TransactionsAdapter adapter;
-    private Box<EtherAddress> addressboxStore;
-    private EtherAddress etherAddress;
+    private TransactionsAdapter transactionAdapter;
     private String address;
-    private EtherApi etherApi;
     private List<EtherTransaction> etherTransactionsList = new ArrayList<>();
-    private DataSubscription observer;
+    private AccountPresenter accountPresenter;
+
+    // views
+    private RecyclerView addressRecyclerView;
+    private TextView balanceTextView;
+    private ImageView addressPhoto;
+    private TextView addressTextView;
+    private FloatingActionButton fab;
 
     @Override
     public void onCreate(Bundle state) {
@@ -57,61 +57,47 @@ public class AccountActivity extends AppCompatActivity {
         setContentView(R.layout.account);
 
         // views
-        address = getIntent().getStringExtra(PUBLIC_ADDRESS);
-        RecyclerView addressRecyclerView = findViewById(R.id.transactions_recycler_view);
-        TextView balanceTextView = findViewById(R.id.balance);
-        ImageView addressPhoto = findViewById(R.id.address_photo);
-        TextView addressTextView = findViewById(R.id.address_textview);
-        FloatingActionButton fab = findViewById(R.id.new_offline_transaction);
+        initViews();
 
-        addressTextView.setText(address);
+        transactionAdapter = getTransactionAdapter();
+        accountPresenter = getAccountPresenter();
 
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        addressRecyclerView.setLayoutManager(layoutManager);
-
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(addressRecyclerView.getContext(),
-                layoutManager.getOrientation());
-        addressRecyclerView.addItemDecoration(dividerItemDecoration);
-
-        etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
-
-        addressboxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
-        addressRepository = new AddressRepository(addressboxStore);
-
-        etherAddress = addressRepository.findOne(address);
-
-        byte[] blockie = etherAddress.getBlockie();
-        Bitmap bitmap = BitmapFactory.decodeByteArray(blockie, 0, blockie.length);
-        addressPhoto.setImageBitmap(bitmap);
-
-        balanceTextView.setText(EtherMath.weiAsEtherStr(etherAddress.getBalance()));
-        etherTransactionsList.addAll(etherAddress.getEtherTransactions());
-
-        int paddingPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
-        adapter = new TransactionsAdapter(etherTransactionsList, address, drawable(R.drawable.orange_rounded_corner),
-                drawable(R.drawable.green_rounded_corner), drawable(R.drawable.dark_rounded_corner), paddingPx);
-        addressRecyclerView.setAdapter(adapter);
+        initTransactionRecyclerView();
 
         fab.setOnClickListener(startOfflineTransaction(address));
 
-        listenForTransactions();
+        accountPresenter.loadEtherAddress();
     }
 
-    private void listenForTransactions() {
-        observer = addressboxStore.query()
-                .equal(EtherAddress_.address, address)
-                .build()
-                .subscribe()
-                .on(AndroidScheduler.mainThread())
-                .observer(address -> {
-                    // should only be one address
-                    if (!address.isEmpty()) {
-                        Log.d(TAG, "Update for " + etherAddress.getAddress() + " with transactions " + etherAddress.getEtherTransactions().size());
-                        etherTransactionsList.clear();
-                        etherTransactionsList.addAll(address.get(0).getEtherTransactions());
-                        adapter.notifyDataSetChanged();
-                    }
-                });
+    private void initViews() {
+        address = getIntent().getStringExtra(PUBLIC_ADDRESS);
+        addressRecyclerView = findViewById(R.id.transactions_recycler_view);
+        balanceTextView = findViewById(R.id.balance);
+        addressPhoto = findViewById(R.id.address_photo);
+        addressTextView = findViewById(R.id.address_textview);
+        fab = findViewById(R.id.new_offline_transaction);
+    }
+
+    private void initTransactionRecyclerView() {
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(addressRecyclerView.getContext(),
+                layoutManager.getOrientation());
+
+        addressRecyclerView.addItemDecoration(dividerItemDecoration);
+        addressRecyclerView.setLayoutManager(layoutManager);
+        addressRecyclerView.setAdapter(transactionAdapter);
+    }
+
+    private TransactionsAdapter getTransactionAdapter() {
+        int paddingPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
+        return new TransactionsAdapter(etherTransactionsList, address, drawable(R.drawable.orange_rounded_corner),
+                drawable(R.drawable.green_rounded_corner), drawable(R.drawable.dark_rounded_corner), paddingPx);
+    }
+
+    private AccountPresenter getAccountPresenter() {
+        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
+        Box<EtherAddress> addressBoxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
+        return new AccountPresenter(this, addressBoxStore, address, etherApi);
     }
 
     private Drawable drawable(int drawable) {
@@ -122,7 +108,7 @@ public class AccountActivity extends AppCompatActivity {
     protected void onResume() {
         super.onResume();
         Log.d(TAG, "Resume called");
-        loadLast50Transactions();
+        accountPresenter.loadLast50Transactions();
     }
 
     @NonNull
@@ -137,27 +123,31 @@ public class AccountActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        observer.cancel();
+        accountPresenter.destroy();
     }
 
-    private void loadLast50Transactions() {
-        etherApi.getTransactions(address, 1)
-                .subscribeOn(Schedulers.io())
-                .subscribe(balances -> saveAddress(balances, etherAddress), e -> handleError(e));
+    @Override
+    public void onTransactions(List<EtherTransaction> transactions) {
+        etherTransactionsList.clear();
+        etherTransactionsList.addAll(transactions);
+        transactionAdapter.notifyDataSetChanged();
     }
 
-    private int handleError(Throwable e) {
+    @Override
+    public void addressLoadError(Throwable e) {
         View viewById = findViewById(R.id.main_container);
         Snackbar.make(viewById, "Unable to fetch transactions. Check Network.", Snackbar.LENGTH_LONG).show();
-        return Log.e(TAG, "Error fetching transactions", e);
+        Log.e(TAG, "Error fetching transactions", e);
     }
 
-    private void saveAddress(List<EtherTransaction> transactions, EtherAddress address) {
-        Log.d(TAG, "On data found " + transactions);
-        Log.d(TAG, "Existing transaction count" + address.getEtherTransactions().size());
-        address.getEtherTransactions().clear();
-        address.getEtherTransactions().addAll(transactions);
-        addressboxStore.put(address);
-    }
+    @Override
+    public void onAddressLoad(EtherAddress address) {
+        byte[] blockie = address.getBlockie();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(blockie, 0, blockie.length);
+        addressPhoto.setImageBitmap(bitmap);
 
+        addressTextView.setText(address.getAddress());
+        balanceTextView.setText(EtherMath.weiAsEtherStr(address.getBalance()));
+        onTransactions(address.getEtherTransactions());
+    }
 }
