@@ -1,9 +1,12 @@
 package com.example.sundeep.offline_ether.mvc.presenters;
 
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
+import com.example.sundeep.offline_ether.entities.Balance;
+import com.example.sundeep.offline_ether.entities.Balances;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
-import com.example.sundeep.offline_ether.mvc.views.AccountView;
+import com.example.sundeep.offline_ether.mvc.views.MainView;
+import com.google.common.collect.ImmutableSet;
 
 import org.junit.AfterClass;
 import org.junit.Before;
@@ -15,9 +18,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.List;
 
 import io.objectbox.Box;
 import io.objectbox.Property;
@@ -35,15 +36,15 @@ import io.reactivex.schedulers.Schedulers;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
-public class AccountPresenterTest {
+public class MainPresenterTest {
+
 
     private static final String ETHER_ADDRESS = "ether:address";
 
-    @Mock private AccountView accountView;
+    @Mock private MainView mainView;
     @Mock private EtherApi etherApi;
     @Mock private QueryBuilder queryBuilder;
     @Mock private Query query;
@@ -52,8 +53,8 @@ public class AccountPresenterTest {
     @Mock private Box<EtherAddress> etherAddressBox;
     @Mock private DataSubscription subscription;
 
+    private MainPresenter underTest;
     private EtherAddress address;
-    private AccountPresenter underTest;
 
     @BeforeClass
     public static void setUpClass() {
@@ -71,53 +72,35 @@ public class AccountPresenterTest {
     public void setUp(){
         address = EtherAddress.newBuilder()
                 .setBalance("1")
+                .setAddress("add1")
                 .setEtherTransactions(toMany)
                 .build();
     }
 
     @Test
-    public void testItListensForTransactions() throws InterruptedException {
+    public void testItListensForAddresses() throws InterruptedException {
         givenEtherAddress(this::answerOneAddress);
 
-        underTest = new AccountPresenter(accountView, etherAddressBox, ETHER_ADDRESS, etherApi);
+        underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
 
-        verify(accountView).onTransactions(toMany);
-    }
-
-    @Test
-    public void testItDoesNotCallViewWhenNoTransactions() throws InterruptedException {
-        givenEtherAddress(this::zeroAddresses);
-
-        underTest = new AccountPresenter(accountView, etherAddressBox, ETHER_ADDRESS, etherApi);
-
-        verifyZeroInteractions(accountView);
+        verify(mainView).loadBalances(Collections.singletonList(address));
     }
 
     @Test
     public void testItLoadsTransactions(){
         givenEtherAddress(this::answerOneAddress);
 
-        underTest = new AccountPresenter(accountView, etherAddressBox, ETHER_ADDRESS, etherApi);
+        underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
 
-        EtherTransaction eth1 = EtherTransaction.newBuilder().setHash("1").build();
-        EtherTransaction eth2 = EtherTransaction.newBuilder().setHash("2").build();
+        Balance balance = new Balance("add1", "2");
 
-        List<EtherTransaction> transactions = Arrays.asList(eth1, eth2);
-        Observable<List<EtherTransaction>> observable = Observable.just(transactions);
-        when(etherApi.getTransactions(ETHER_ADDRESS, 1)).thenReturn(observable);
+        Observable<Balances> observable = Observable.just(new Balances(Collections.singletonList(balance)));
+        when(etherApi.getBalance(ImmutableSet.of("add1"))).thenReturn(observable);
 
+        underTest.loadBalances();
 
-        underTest.loadLast50Transactions();
+        verify(etherAddressBox).put(Collections.singletonList(EtherAddress.newBuilder(address).setBalance("2").build()));
 
-        verify(etherAddressBox).put(address);
-        verify(toMany).addAll(transactions);
-
-    }
-
-    private DataSubscription zeroAddresses(InvocationOnMock invocation) throws Throwable {
-        DataObserver observer = (DataObserver) invocation.getArguments()[0];
-        observer.onData(Collections.emptyList());
-        return subscription;
     }
 
     private DataSubscription answerOneAddress(InvocationOnMock invocation) throws Throwable {
@@ -132,6 +115,7 @@ public class AccountPresenterTest {
         when(query.subscribe()).thenReturn(subscriptionBuilder);
         when(queryBuilder.build()).thenReturn(query);
         when(query.findFirst()).thenReturn(address);
+        when(query.find()).thenReturn(Collections.singletonList(address));
         when(subscriptionBuilder.on(any())).thenReturn(subscriptionBuilder);
         when(subscriptionBuilder.onError(any())).thenReturn(subscriptionBuilder);
         when(queryBuilder.equal(any(Property.class), eq(ETHER_ADDRESS))).thenReturn(queryBuilder);
