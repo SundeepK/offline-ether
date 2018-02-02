@@ -18,6 +18,7 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.runners.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
+import java.util.Arrays;
 import java.util.Collections;
 
 import io.objectbox.Box;
@@ -55,6 +56,7 @@ public class MainPresenterTest {
 
     private MainPresenter underTest;
     private EtherAddress address;
+    private EtherAddress address2;
 
     @BeforeClass
     public static void setUpClass() {
@@ -75,11 +77,16 @@ public class MainPresenterTest {
                 .setAddress("add1")
                 .setEtherTransactions(toMany)
                 .build();
+        address2 = EtherAddress.newBuilder()
+                .setBalance("1")
+                .setAddress("add2")
+                .setEtherTransactions(toMany)
+                .build();
     }
 
     @Test
     public void testItListensForAddresses() throws InterruptedException {
-        givenEtherAddress(this::answerOneAddress);
+        givenEtherAddress(this::answerOneAddress, address);
 
         underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
 
@@ -88,7 +95,7 @@ public class MainPresenterTest {
 
     @Test
     public void testItLoadsTransactions(){
-        givenEtherAddress(this::answerOneAddress);
+        givenEtherAddress(this::answerOneAddress, address);
 
         underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
 
@@ -103,19 +110,46 @@ public class MainPresenterTest {
 
     }
 
+    @Test
+    public void testItLoadsMultipleTransactions(){
+        givenEtherAddress(this::answerTwoAddress, address, address2);
+
+        underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
+
+        Balance balance = new Balance("add1", "2");
+        Balance balance2 = new Balance("add2", "3");
+
+        Observable<Balances> observable = Observable.just(new Balances(Arrays.asList(balance, balance2)));
+        when(etherApi.getBalance(ImmutableSet.of("add1", "add2"))).thenReturn(observable);
+
+        underTest.loadBalances();
+
+        EtherAddress a1 = EtherAddress.newBuilder(address).setBalance("2").build();
+        EtherAddress a2 = EtherAddress.newBuilder(address2).setBalance("3").build();
+        verify(etherAddressBox).put(Arrays.asList(a1, a2));
+
+    }
+
     private DataSubscription answerOneAddress(InvocationOnMock invocation) throws Throwable {
+        DataObserver observer = (DataObserver) invocation.getArguments()[0];
+
+        observer.onData(Arrays.asList(address));
+        return subscription;
+    }
+
+    private DataSubscription answerTwoAddress(InvocationOnMock invocation) throws Throwable {
         DataObserver observer = (DataObserver) invocation.getArguments()[0];
 
         observer.onData(Collections.singletonList(address));
         return subscription;
     }
 
-    private void givenEtherAddress(Answer answers) {
+    private void givenEtherAddress(Answer answers, EtherAddress... addresses) {
         when(subscriptionBuilder.observer(any(DataObserver.class))).then(answers);
         when(query.subscribe()).thenReturn(subscriptionBuilder);
         when(queryBuilder.build()).thenReturn(query);
         when(query.findFirst()).thenReturn(address);
-        when(query.find()).thenReturn(Collections.singletonList(address));
+        when(query.find()).thenReturn(Arrays.asList(addresses));
         when(subscriptionBuilder.on(any())).thenReturn(subscriptionBuilder);
         when(subscriptionBuilder.onError(any())).thenReturn(subscriptionBuilder);
         when(queryBuilder.equal(any(Property.class), eq(ETHER_ADDRESS))).thenReturn(queryBuilder);
