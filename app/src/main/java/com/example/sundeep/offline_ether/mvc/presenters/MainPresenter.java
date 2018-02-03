@@ -15,6 +15,7 @@ import io.objectbox.Box;
 import io.objectbox.android.AndroidScheduler;
 import io.objectbox.reactive.DataSubscription;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
 public class MainPresenter {
@@ -48,10 +49,10 @@ public class MainPresenter {
         mainView.onAddAccount();
     }
 
-    public void loadBalances() {
+    public Disposable loadBalances() {
         List<EtherAddress> etherAddresses = boxStore.query().build().find();
         ImmutableMap<String, EtherAddress> addressToEtherAccount = Maps.uniqueIndex(etherAddresses, EtherAddress::getAddress);
-        etherApi.getBalance(addressToEtherAccount.keySet())
+        return etherApi.getBalance(addressToEtherAccount.keySet())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(balances -> updateBalances(addressToEtherAccount, balances.getResult()), mainView::onAccountLoadError);
