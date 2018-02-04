@@ -33,7 +33,7 @@ import static org.mockito.Mockito.when;
 @RunWith(MockitoJUnitRunner.class)
 public class BalanceCurrencyPresenterTest {
 
-   @Mock DataSubscription dataSubscription;
+   @Mock private DataSubscription dataSubscription;
    @Mock private EtherApi etherApi;
    @Mock private AddressRepository addressRepository;
    @Mock private BalanceView balanceView;

@@ -15,7 +15,6 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
-import io.objectbox.reactive.DataObserver;
 import io.objectbox.reactive.DataSubscription;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -27,26 +26,28 @@ public class BalanceCurrencyPresenter {
     private final EtherApi etherApi;
     private final Map<String, String> cachedPrices = new HashMap<>();
     private final BalanceView balanceView;
+    private final AddressRepository addressRepository;
     private long lastUpdate = 0;
 
     public BalanceCurrencyPresenter(EtherApi etherApi, AddressRepository addressRepository, BalanceView balanceView) {
         this.etherApi = etherApi;
         this.balanceView = balanceView;
-        this.observer = addressRepository.observeAddressesChanges(handleAddressUpdate());
+        this.addressRepository = addressRepository;
+        this.observer = addressRepository.observeAddressesChanges(this::updateBalance);
     }
 
     public void destroy(){
         observer.cancel();
     }
 
-    private DataObserver<List<EtherAddress>> handleAddressUpdate() {
-        return new DataObserver<List<EtherAddress>>() {
-            @Override
-            public void onData(List<EtherAddress> newAddresses) {
-                BigDecimal balanceEther = EtherMath.sumAddresses(newAddresses);
-                updateBalanceInCurrency(balanceEther);
-            }
-        };
+    public void refreshBalances(){
+        List<EtherAddress> all = addressRepository.findAll();
+        updateBalance(all);
+    }
+
+    private void updateBalance(List<EtherAddress> newAddresses) {
+        BigDecimal balanceEther = EtherMath.sumAddresses(newAddresses);
+        updateBalanceInCurrency(balanceEther);
     }
 
     private void updateBalanceInCurrency(BigDecimal ether) {
