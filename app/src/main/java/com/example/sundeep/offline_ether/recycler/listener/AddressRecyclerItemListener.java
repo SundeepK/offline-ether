@@ -1,4 +1,4 @@
-package com.example.sundeep.offline_ether;
+package com.example.sundeep.offline_ether.recycler.listener;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -7,8 +7,8 @@ import android.support.v4.view.ViewCompat;
 import android.view.View;
 import android.widget.ImageView;
 
+import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.activities.AccountActivity;
-import com.example.sundeep.offline_ether.activities.RecyclerItemClickListener;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 
 import java.util.List;
