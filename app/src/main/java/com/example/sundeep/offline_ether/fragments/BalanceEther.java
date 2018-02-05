@@ -1,7 +1,6 @@
 package com.example.sundeep.offline_ether.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,19 +10,15 @@ import android.widget.TextView;
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
-import com.example.sundeep.offline_ether.utils.EtherMath;
-
-import java.util.List;
+import com.example.sundeep.offline_ether.mvc.presenters.BalanceEtherPresenter;
+import com.example.sundeep.offline_ether.mvc.views.BalanceEtherView;
+import com.example.sundeep.offline_ether.objectbox.AddressRepository;
 
 import io.objectbox.Box;
-import io.objectbox.android.AndroidScheduler;
-import io.objectbox.query.Query;
-import io.objectbox.reactive.DataObserver;
-import io.objectbox.reactive.DataSubscription;
 
-public class BalanceEther extends Fragment {
+public class BalanceEther extends Fragment implements BalanceEtherView {
 
-    private DataSubscription observer;
+    BalanceEtherPresenter balanceEtherPresenter;
     private TextView balance;
 
     @Override
@@ -34,11 +29,7 @@ public class BalanceEther extends Fragment {
         balance = rootView.findViewById(R.id.balance_textView);
 
         final Box<EtherAddress> boxStore = ((App) getActivity().getApplication()).getBoxStore().boxFor(EtherAddress.class);
-        Query<EtherAddress> addressQuery = boxStore.query().build();
-        observer = addressQuery
-                .subscribe()
-                .on(AndroidScheduler.mainThread())
-                .observer(onDataChanged());
+        balanceEtherPresenter = new BalanceEtherPresenter(new AddressRepository(boxStore), this);
 
         return rootView;
     }
@@ -46,16 +37,12 @@ public class BalanceEther extends Fragment {
     @Override
     public void onDestroy() {
         super.onDestroy();
-        observer.cancel();
+        balanceEtherPresenter.destroy();
     }
 
-    @NonNull
-    private DataObserver<List<EtherAddress>> onDataChanged() {
-        return newAddresses -> {
-            String balanceEther = EtherMath.sumAddresses(newAddresses) + " ETH";
-            balance.setText(balanceEther);
-        };
+    @Override
+    public void onEtherBalanceLoad(String balanceEther) {
+        balance.setText(balanceEther);
     }
-
 
 }
