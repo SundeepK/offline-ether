@@ -14,38 +14,29 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.sundeep.offline_ether.R;
-import com.example.sundeep.offline_ether.recycler.listener.RecyclerItemClickListener;
 import com.example.sundeep.offline_ether.adapters.GasPricesAdapter;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
-import com.example.sundeep.offline_ether.entities.EthGas;
-import com.example.sundeep.offline_ether.entities.EthGasAndNonce;
 import com.example.sundeep.offline_ether.entities.GasPrice;
 import com.example.sundeep.offline_ether.entities.Nonce;
+import com.example.sundeep.offline_ether.mvc.presenters.EthGasPresenter;
+import com.example.sundeep.offline_ether.mvc.views.EthGasView;
+import com.example.sundeep.offline_ether.recycler.listener.RecyclerItemClickListener;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 
 
-public class GasFragment extends Fragment {
+public class GasFragment extends Fragment implements EthGasView {
 
     private static final String TAG = "GasFragment";
-    private double realGas;
-    private BigDecimal curTxCost = new BigDecimal("0.000252");
-    private String gasLimit = "21000";
     private List<GasPrice> gasPrices = new ArrayList<>();
     private GasPricesAdapter adapter;
     private int selected = -1;
     private OnGasSelectedListener onGasSelectedListener;
     private Nonce nonce = null;
-    private Disposable subscribe;
+    private EthGasPresenter ethGasPresenter;
 
     public interface OnGasSelectedListener {
         public void onGasSelected(GasPrice gasPrice, Nonce nonce);
@@ -68,7 +59,16 @@ public class GasFragment extends Fragment {
 
         gasPricesRecyclerView.addOnItemTouchListener(getGasPriceOnClick(gasPricesRecyclerView));
 
+        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
+        ethGasPresenter = new EthGasPresenter(etherApi, this);
+
         return rootView;
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        ethGasPresenter.destroy();
     }
 
     @NonNull
@@ -108,31 +108,29 @@ public class GasFragment extends Fragment {
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
-
-        if (subscribe != null) {
+        if (!gasPrices.isEmpty()) {
             return;
         }
-
         String address = getArguments().getString(PUBLIC_ADDRESS);
-
-        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
-        Observable<EthGas> ethgas = etherApi.getEthgas();
-        Observable<Nonce> nonce = etherApi.getNonce(address);
-
-        subscribe = Observable.zip(ethgas, nonce, EthGasAndNonce::new)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(this::updateGasAndNonce, e -> Log.e(TAG, "Error fetching transactions", e));
+        ethGasPresenter.loadEthGasData(address);
     }
 
-    private void updateGasAndNonce(EthGasAndNonce ethGasAndNonce) {
+    @Override
+    public void onEthGasPrice(List<GasPrice> prices) {
         gasPrices.clear();
-        EthGas ethGas = ethGasAndNonce.getEthGas();
-        gasPrices.add(new GasPrice("Slow", ethGas.getSafeLow() / 10, ethGas.getSafeLowWait(), false));
-        gasPrices.add(new GasPrice("Average", ethGas.getAverage() / 10, ethGas.getAvgWait(), false));
-        gasPrices.add(new GasPrice("Fast", ethGas.getFast() / 10, ethGas.getFastWait(), false));
-        nonce = ethGasAndNonce.getNonce();
-        Log.d(TAG, "nonce" + nonce);
+        gasPrices.addAll(prices);
         adapter.notifyDataSetChanged();
     }
+
+    @Override
+    public void onNonce(Nonce loadedNonce) {
+        nonce = loadedNonce;
+        Log.d(TAG, "nonce" + nonce);
+    }
+
+    @Override
+    public void onErrorLoadingEthGasAndNonce(Throwable e) {
+        Log.e(TAG, "Error fetching transactions", e);
+    }
+
 }
