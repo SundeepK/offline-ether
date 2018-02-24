@@ -10,23 +10,21 @@ import android.widget.TextView;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.SentTransaction;
+import com.example.sundeep.offline_ether.mvc.presenters.SendTransactionPresenter;
+import com.example.sundeep.offline_ether.mvc.views.SendTransactionView;
 
-import io.reactivex.Observer;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.disposables.Disposable;
-import io.reactivex.schedulers.Schedulers;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 import static com.example.sundeep.offline_ether.Constants.SIGNED_TRANSACTION;
 
-public class SendTransactionActivity extends AppCompatActivity {
+public class SendTransactionActivity extends AppCompatActivity implements SendTransactionView {
 
     private final static String TAG = "SendTransactionActivty";
     private ProgressBar progressBar;
     private FancyButton okButton;
     private FancyButton sendButton;
     private TextView message;
-    private EtherApi etherApi;
+    private SendTransactionPresenter sendTransactionPresenter;
 
     @Override
     public void onCreate(Bundle state) {
@@ -43,54 +41,52 @@ public class SendTransactionActivity extends AppCompatActivity {
         okButton.setVisibility(View.GONE);
 
         String transaction = getIntent().getStringExtra(SIGNED_TRANSACTION);
+        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
 
-        etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
+        sendTransactionPresenter = new SendTransactionPresenter(etherApi, this);
+
         okButton.setOnClickListener(view -> SendTransactionActivity.this.finish());
-        sendButton.setOnClickListener(view -> sendTransaction(transaction));
-
+        sendButton.setOnClickListener(view -> sendTransactionPresenter.sendTransaction(transaction));
     }
 
-    private void sendTransaction(String transaction) {
-        etherApi.sendTransaction(transaction)
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeOn(Schedulers.io())
-                .subscribe(new Observer<SentTransaction>() {
-                    @Override
-                    public void onSubscribe(Disposable d) {
-                        sendButton.setVisibility(View.GONE);
-                        progressBar.setVisibility(View.VISIBLE);
-                        message.setText("Broadcasting transaction...");
-                    }
-
-                    @Override
-                    public void onNext(SentTransaction sentTransaction) {
-                        message.setVisibility(View.VISIBLE);
-                        if (sentTransaction.getError() != null) {
-                            sendButton.setText("Retry");
-                            sendButton.setVisibility(View.VISIBLE);
-                            message.setText("Error occurred sending transaction. \n" + sentTransaction.getError().getMessage());
-                        } else {
-                            okButton.setVisibility(View.VISIBLE);
-                            message.setText("Transaction successfully sent.");
-                        }
-                        progressBar.setVisibility(View.GONE);
-                    }
-
-                    @Override
-                    public void onError(Throwable e) {
-                        Log.e(TAG, "Error sending transactions", e);
-                        progressBar.setVisibility(View.GONE);
-                        sendButton.setText("Retry");
-                        sendButton.setVisibility(View.VISIBLE);
-                        message.setText("Error occurred sending transaction. \nCheck network settings." );
-                    }
-
-                    @Override
-                    public void onComplete() {
-                        Log.d(TAG, "Completed transaction");
-                    }
-                });
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        sendTransactionPresenter.destroy();
     }
 
+    @Override
+    public void beforeSendingTransaction() {
+        sendButton.setVisibility(View.GONE);
+        progressBar.setVisibility(View.VISIBLE);
+        message.setText("Broadcasting transaction...");
+    }
 
+    @Override
+    public void onTransactionSent(SentTransaction sentTransaction) {
+        message.setVisibility(View.VISIBLE);
+        if (sentTransaction.getError() != null) {
+            sendButton.setText("Retry");
+            sendButton.setVisibility(View.VISIBLE);
+            message.setText("Error occurred sending transaction. \n" + sentTransaction.getError().getMessage());
+        } else {
+            okButton.setVisibility(View.VISIBLE);
+            message.setText("Transaction successfully sent.");
+        }
+        progressBar.setVisibility(View.GONE);
+    }
+
+    @Override
+    public void onTransactionBroadcastError(Throwable e) {
+        Log.e(TAG, "Error sending transactions", e);
+        progressBar.setVisibility(View.GONE);
+        sendButton.setText("Retry");
+        sendButton.setVisibility(View.VISIBLE);
+        message.setText("Error occurred sending transaction. \nCheck network settings." );
+    }
+
+    @Override
+    public void onComplete() {
+        Log.d(TAG, "Completed transaction");
+    }
 }

@@ -5,6 +5,13 @@ public class SentTransaction {
     private TransactionError error;
     private String result;
 
+    public SentTransaction(){}
+
+    public SentTransaction(TransactionError error, String result) {
+        this.error = error;
+        this.result = result;
+    }
+
     public TransactionError getError() {
         return error;
     }
