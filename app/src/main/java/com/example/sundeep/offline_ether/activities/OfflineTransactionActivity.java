@@ -30,7 +30,7 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
     private ViewPager viewPager;
     private LinearLayout dotsLayout;
     private TextView[] dots;
-    private int layouts;
+    private int layouts = 3;
     private FancyButton btnBack;
     private FancyButton btnNext;
     private FragmentPagerAdapter offlineFlowFragmentAdapter;
@@ -50,8 +50,6 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
         btnNext = findViewById(R.id.btn_next);
         btnBack.setVisibility(View.GONE);
 
-        layouts = 3;
-
         // adding bottom dots
         addBottomDots(0);
 
@@ -62,13 +60,10 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
 
 
         btnNext.setEnabled(false);
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                int current = getItem(-1);
-                if (current >= 0) {
-                    viewPager.setCurrentItem(current);
-                }
+        btnBack.setOnClickListener(v -> {
+            int current = getItem(-1);
+            if (current >= 0) {
+                viewPager.setCurrentItem(current);
             }
         });
 

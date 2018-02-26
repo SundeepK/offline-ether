@@ -49,6 +49,10 @@ public class MainPresenter {
         mainView.onAddAccount();
     }
 
+    public void deleteAccount(EtherAddress etherAddress){
+        boxStore.remove(etherAddress);
+    }
+
     public Disposable loadBalances() {
         List<EtherAddress> etherAddresses = boxStore.query().build().find();
         ImmutableMap<String, EtherAddress> addressToEtherAccount = Maps.uniqueIndex(etherAddresses, EtherAddress::getAddress);

@@ -18,7 +18,7 @@ import java.util.List;
 
 public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.EtherAddressViewHolder>{
 
-    private List<EtherAddress> etherAddresses;
+    private final List<EtherAddress> etherAddresses;
     private final static String TAG  = "AddressAdapter";
 
     public AccountAdapter(List<EtherAddress> etherAddresses){
@@ -60,6 +60,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.EtherAdd
         TextView lastTransaction;
         TextView balance;
         ImageView addressPhoto;
+        ImageView moreOptions;
 
         EtherAddressViewHolder(View itemView) {
             super(itemView);
@@ -67,6 +68,7 @@ public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.EtherAdd
             lastTransaction = (TextView)itemView.findViewById(R.id.last_transaction);
             balance = (TextView)itemView.findViewById(R.id.balance);
             addressPhoto = (ImageView)itemView.findViewById(R.id.address_photo);
+            moreOptions = (ImageView)itemView.findViewById(R.id.more_options);
         }
     }
 

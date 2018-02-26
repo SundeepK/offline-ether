@@ -35,7 +35,7 @@ import java.util.List;
 
 import io.objectbox.Box;
 
-public class MainActivity extends AppCompatActivity implements MainView {
+public class MainActivity extends AppCompatActivity implements MainView, AddressRecyclerItemListener.OnAccountDeleteListener {
 
     private final static String TAG = "MainActivity";
     private static final int ZXING_CAMERA_PERMISSION = 1;
@@ -104,7 +104,7 @@ public class MainActivity extends AppCompatActivity implements MainView {
     private RecyclerItemClickListener showAccountOnClick() {
         return new RecyclerItemClickListener(this.getApplicationContext(),
                 addressRecyclerView,
-                new AddressRecyclerItemListener(this, addressList));
+                new AddressRecyclerItemListener(this, addressList, this));
     }
 
     @NonNull
@@ -180,5 +180,10 @@ public class MainActivity extends AppCompatActivity implements MainView {
             Intent intent = new Intent(this, clazz);
             startActivity(intent);
         }
+    }
+
+    @Override
+    public void onAccountDelete(EtherAddress etherAddress) {
+//        mainPresenter.deleteAccount(etherAddress);
     }
 }

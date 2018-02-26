@@ -20,17 +20,27 @@
             android:layout_height="wrap_content"
             android:padding="16dp">
 
+            <ImageButton
+                android:id="@+id/more_options"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@mipmap/ic_more_vert_white_24dp"
+                android:layout_alignParentRight="true"
+                android:background="@null"/>
+
+
             <ImageView
+                android:layout_below="@id/more_options"
                 android:layout_width="80dp"
                 android:layout_height="80dp"
                 android:id="@+id/address_photo"
                 android:layout_alignParentLeft="true"
-                android:layout_alignParentTop="true"
                 android:layout_marginRight="16dp"
                 android:transitionName="address_photo_transition"
                 />
 
             <TextView
+                android:layout_below="@id/more_options"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:id="@+id/balance"
@@ -38,7 +48,6 @@
                 android:textColor="#FBFBFB"
                 android:transitionName="bal_transition"
                 android:layout_toRightOf="@+id/address_photo"
-                android:layout_alignParentTop="true"
                 />
 
             <TextView

@@ -10,6 +10,7 @@ import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -75,7 +76,7 @@ public class GasFragment extends Fragment implements EthGasView {
     private RecyclerItemClickListener getGasPriceOnClick(RecyclerView gasPricesRecyclerView) {
         return new RecyclerItemClickListener(this.getContext(), gasPricesRecyclerView, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
-            public void onItemClick(View view, int position) {
+            public void onItemClick(View view, int position, MotionEvent e) {
                 if (selected >= 0) {
                     GasPrice gasPrice = gasPrices.get(selected);
                     gasPrices.set(selected, GasPrice.newBuilder(gasPrice).setIsSelected(false).build());
