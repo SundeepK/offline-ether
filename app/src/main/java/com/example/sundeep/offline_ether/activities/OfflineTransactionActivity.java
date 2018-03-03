@@ -57,8 +57,6 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
         offlineFlowFragmentAdapter = new OfflineFlowFragmentAdapter(getSupportFragmentManager(), address, sharedBundle);
         viewPager.setAdapter(offlineFlowFragmentAdapter);
 
-
-
         btnNext.setEnabled(false);
         btnBack.setOnClickListener(v -> {
             int current = getItem(-1);

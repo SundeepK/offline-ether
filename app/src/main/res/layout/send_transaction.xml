@@ -30,7 +30,7 @@
         android:layout_margin="10dp"
         fancy:fb_textSize="16sp"
         fancy:fb_disabledColor="#5D5D5D"
-        android:text="Send"
+        android:text="@string/send"
         />
 
     <mehdi.sakout.fancybuttons.FancyButton
@@ -46,7 +46,7 @@
         android:layout_margin="10dp"
         fancy:fb_textSize="16sp"
         fancy:fb_disabledColor="#5D5D5D"
-        android:text="Send"
+        android:text="@string/send"
         />
 
     <TextView
@@ -60,6 +60,6 @@
         android:layout_margin="20dp"
         android:textColor="#FBFBFB"
         android:textSize="24sp"
-        android:text="TextView" />
+        />
 
 </RelativeLayout>

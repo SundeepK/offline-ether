@@ -62,7 +62,7 @@ public class TransactionsAdapter extends RecyclerView.Adapter<TransactionsAdapte
         Date date = new Date(etherTransaction.getTimeStamp() * 1000);
         viewHolder.date.setText(dateFormat.format(date));
         viewHolder.value.setText(EtherMath.weiAsEtherStr(etherTransaction.getValue()));
-        viewHolder.confirmationsTextView.setText(etherTransaction.getConfirmations() + "");
+        viewHolder.confirmationsTextView.setText("Confirmations: " + etherTransaction.getConfirmations());
         if (etherTransaction.getConfirmations() <= 10) {
             viewHolder.inOrOut.setText("PEND");
             viewHolder.inOrOut.setBackground(loadingDrawable);
@@ -84,14 +84,12 @@ public class TransactionsAdapter extends RecyclerView.Adapter<TransactionsAdapte
         TextView confirmationsTextView;
         TextView date;
         TextView value;
-        TextView isOutGoing;
         TextView inOrOut;
 
         EtherTransactionViewHolder(View itemView) {
             super(itemView);
             date = itemView.findViewById(R.id.date);
             value = itemView.findViewById(R.id.value);
-            isOutGoing = itemView.findViewById(R.id.outgoing);
             confirmationsTextView = itemView.findViewById(R.id.confirmations_textview);
             inOrOut = itemView.findViewById(R.id.status_textview);
             shimmer = itemView.findViewById(R.id.shimmer_view_container);

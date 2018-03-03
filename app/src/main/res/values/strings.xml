@@ -4,4 +4,12 @@
 
     <string name="next">Next</string>
     <string name="skip">Back</string>
+    <string name="error_fetching_gas_prices_check_network">Error fetching gas prices, check network.</string>
+    <string name="step_1_gas_prices">Step 1 gas prices/</string>
+    <string name="you_haven_t_added_any_addresses_yet">You haven\'t added any addresses yet</string>
+    <string name="tap_the_button_to_get_started">Tap the + button to get started</string>
+    <string name="send">Send</string>
+    <string name="gas_price">Gas price</string>
+    <string name="wait_time">Wait time</string>
+    <string name="nonce">Nonce</string>
 </resources>

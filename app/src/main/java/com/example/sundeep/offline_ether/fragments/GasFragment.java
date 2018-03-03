@@ -13,6 +13,8 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.adapters.GasPricesAdapter;
@@ -38,6 +40,9 @@ public class GasFragment extends Fragment implements EthGasView {
     private OnGasSelectedListener onGasSelectedListener;
     private Nonce nonce = null;
     private EthGasPresenter ethGasPresenter;
+    private RecyclerView gasPricesRecyclerView;
+    private TextView errorFetchingGasMessage;
+    private ProgressBar gasProgressBar;
 
     public interface OnGasSelectedListener {
         public void onGasSelected(GasPrice gasPrice, Nonce nonce);
@@ -48,7 +53,9 @@ public class GasFragment extends Fragment implements EthGasView {
                              Bundle savedInstanceState) {
 
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.step_one_offline_transaction, container, false);
-        RecyclerView gasPricesRecyclerView = rootView.findViewById(R.id.gas_prices_recycler_view);
+        gasPricesRecyclerView = rootView.findViewById(R.id.gas_prices_recycler_view);
+        errorFetchingGasMessage = rootView.findViewById(R.id.error_gas_textview);
+        gasProgressBar = rootView.findViewById(R.id.fetch_gas_progress);
         LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         gasPricesRecyclerView.setLayoutManager(layoutManager);
         adapter = new GasPricesAdapter(gasPrices);
@@ -114,10 +121,14 @@ public class GasFragment extends Fragment implements EthGasView {
         }
         String address = getArguments().getString(PUBLIC_ADDRESS);
         ethGasPresenter.loadEthGasData(address);
+        gasProgressBar.setVisibility(View.VISIBLE);
     }
 
     @Override
     public void onEthGasPrice(List<GasPrice> prices) {
+        errorFetchingGasMessage.setVisibility(View.GONE);
+        gasPricesRecyclerView.setVisibility(View.VISIBLE);
+        gasProgressBar.setVisibility(View.GONE);
         gasPrices.clear();
         gasPrices.addAll(prices);
         adapter.notifyDataSetChanged();
@@ -131,7 +142,10 @@ public class GasFragment extends Fragment implements EthGasView {
 
     @Override
     public void onErrorLoadingEthGasAndNonce(Throwable e) {
-        Log.e(TAG, "Error fetching transactions", e);
+        errorFetchingGasMessage.setVisibility(View.VISIBLE);
+        gasPricesRecyclerView.setVisibility(View.GONE);
+        gasProgressBar.setVisibility(View.GONE);
+        Log.e(TAG, "Error fetching Gas data", e);
     }
 
 }

@@ -43,17 +43,10 @@
             android:textSize="16sp" />
 
         <TextView
-            android:id="@+id/outgoing"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/date"
-            android:layout_toRightOf="@+id/shimmer_view_container" />
-
-        <TextView
             android:id="@+id/confirmations_textview"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@+id/outgoing"
+            android:layout_below="@+id/date"
             android:textColor="#666666"
             android:textSize="12sp"
             android:layout_toRightOf="@+id/shimmer_view_container" />

@@ -59,7 +59,7 @@
         android:layout_marginLeft="20dp"
         android:textColor="#FBFBFB"
         android:layout_marginTop="20dp"
-        android:text="Wait time"
+        android:text="@string/wait_time"
         android:textStyle="bold" />
 
     <TextView
@@ -76,7 +76,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:layout_marginLeft="20dp"
-        android:text="Gas price"
+        android:text="@string/gas_price"
         android:textColor="#FBFBFB"
         android:layout_marginTop="20dp"
         android:textStyle="bold" />
@@ -97,7 +97,7 @@
         android:layout_marginLeft="20dp"
         android:textColor="#FBFBFB"
         android:layout_marginTop="20dp"
-        android:text="Nonce"
+        android:text="@string/nonce"
         android:textStyle="bold" />
 
     <TextView
