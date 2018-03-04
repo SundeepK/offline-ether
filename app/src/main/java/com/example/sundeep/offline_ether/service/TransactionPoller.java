@@ -1,97 +1,119 @@
 package com.example.sundeep.offline_ether.service;
 
-import android.app.IntentService;
-import android.content.Intent;
 import android.support.annotation.NonNull;
-import android.support.annotation.Nullable;
 import android.util.Log;
-import android.util.Pair;
 
-import com.example.sundeep.offline_ether.App;
-import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
 import com.google.common.collect.Collections2;
 
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import io.objectbox.Box;
 import io.objectbox.reactive.DataSubscription;
+import io.objectbox.relation.ToMany;
 import io.reactivex.Observable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 
-public class TransactionPoller extends IntentService {
+public class TransactionPoller {
 
     private static final String TAG = "TransactionPoller";
-    private EtherApi etherApi;
+    private final EtherApi etherApi;
+    private final Box<EtherAddress> boxStore;
+    private final Map<String, Long> addresses;
+    private final int delay;
+    private final TimeUnit timeUnit;
     private DataSubscription addressQuery;
-    private Map<String, EtherAddress> addresses = new HashMap<>();
-    private Box<EtherAddress> boxStore;
+    private Disposable repeat;
 
-    public TransactionPoller() {
-        super("TransactionPoller");
+    public TransactionPoller(EtherApi etherApi,
+                             Box<EtherAddress> boxStore,
+                             Map<String, Long> addresses,
+                             int delay,
+                             TimeUnit timeUnit) {
+        this.etherApi = etherApi;
+        this.boxStore = boxStore;
+        this.addresses = addresses;
+        this.delay = delay;
+        this.timeUnit = timeUnit;
     }
 
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        addressQuery.cancel();
-    }
-
-    private synchronized void updateAddresses(List<EtherAddress> refreshedData) {
-        Log.d(TAG, "Found addresses " + refreshedData);
-        for (EtherAddress etherAddress : refreshedData) {
-            addresses.put(etherAddress.getAddress().toLowerCase(), etherAddress);
-        }
-        Log.d(TAG, "addresses " + addresses);
-    }
-
-    @Override
-    protected void onHandleIntent(@Nullable Intent intent) {
-        etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
-
-        boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
+    public void pollTransactions() {
         addressQuery = boxStore.query().build()
                 .subscribe()
                 .observer(this::updateAddresses);
 
-        Collection<Observable<String>> transactions = Collections2.transform(addresses.keySet(), Observable::just);
-        Observable.merge(transactions)
+        Collection<Observable<String>> addressesToSearch = Collections2.transform(addresses.keySet(), Observable::just);
+        repeat = Observable.merge(addressesToSearch)
                 .flatMap(this::getTransactions)
-                .repeatWhen(completed -> completed.delay(30, TimeUnit.SECONDS))
-                .subscribe(this::handleUpdates, e -> Log.e(TAG, "Error fetching transactions", e));
+                 .repeatWhen(completed -> completed.delay(delay, timeUnit))
+                .subscribe(this::handleUpdates, this::handleError);
     }
 
-    private Observable<Pair<String, List<EtherTransaction>>> getTransactions(String address) {
+    private void handleError(Throwable throwable) {
+        Log.e(TAG, "Error fetching transactions.", throwable);
+    }
+
+    public void destroy() {
+        if (addressQuery != null) {
+            addressQuery.cancel();
+        }
+        if (repeat != null) {
+            repeat.dispose();
+        }
+    }
+
+    private void updateAddresses(List<EtherAddress> refreshedData) {
+        Log.d(TAG, "Found addresses " + refreshedData);
+        for (EtherAddress etherAddress : refreshedData) {
+            String key = etherAddress.getAddress().toLowerCase();
+            if (!addresses.containsKey(key)) {
+                addresses.put(key, etherAddress.getId());
+            }
+        }
+    }
+
+    private Observable<AddressToTransactions> getTransactions(String address) {
         return etherApi
                 .getTransactions(address, 1)
                 .map(toPair(address));
     }
 
     @NonNull
-    private Function<List<EtherTransaction>, Pair<String, List<EtherTransaction>>> toPair(String address) {
-        return etherTransactions -> new Pair<>(address, etherTransactions);
+    private Function<List<EtherTransaction>, AddressToTransactions> toPair(String address) {
+        return (List<EtherTransaction> transactions) -> {
+            return new AddressToTransactions(address, transactions);
+        };
     }
 
-    private synchronized EtherAddress getAddress(String address){
-        return addresses.get(address);
-    }
-
-    private void handleUpdates(Pair<String, List<EtherTransaction>> stringListPair) {
-        String address = stringListPair.first;
-        List<EtherTransaction> newTransactions = stringListPair.second;
-        if (!newTransactions.isEmpty()) {
-            EtherAddress etherAddress = getAddress(address);
-            if (etherAddress != null) {
-                etherAddress.getEtherTransactions().clear();
-                etherAddress.getEtherTransactions().addAll(newTransactions);
+    private void handleUpdates(AddressToTransactions addressToTransactions) {
+        String address = addressToTransactions.address;
+        List<EtherTransaction> newTransactions = addressToTransactions.transactions;
+        if (address != null && newTransactions != null && !newTransactions.isEmpty()) {
+            Long id = addresses.get(address);
+            if (id != null) {
+                Log.d(TAG, "Updating transactions " + newTransactions);
+                EtherAddress etherAddress = boxStore.get(id);
+                ToMany<EtherTransaction> etherTransactions = etherAddress.getEtherTransactions();
+                etherTransactions.clear();
+                etherTransactions.addAll(newTransactions);
                 boxStore.put(etherAddress);
             }
+        }
+    }
+
+    private static class AddressToTransactions {
+        String address;
+        List<EtherTransaction> transactions;
+
+        public AddressToTransactions(String address, List<EtherTransaction> transactions) {
+            this.address = address;
+            this.transactions = transactions;
         }
     }
 
