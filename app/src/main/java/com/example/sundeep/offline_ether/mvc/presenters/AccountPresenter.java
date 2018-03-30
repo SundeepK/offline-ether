@@ -20,28 +20,31 @@ public class AccountPresenter {
 
     private final AccountView accountview;
     private final Box<EtherAddress> addressBoxStore;
-    private final String address;
     private final EtherApi etherApi;
-    private final EtherAddress etherAddress;
-    private final DataSubscription transactionObserver;
+    private DataSubscription transactionObserver;
+    private EtherAddress etherAddress;
     private Disposable transactionDisposable;
 
-    public AccountPresenter(AccountView accountview, Box<EtherAddress> addressBoxStore,
-                            String address, EtherApi etherApi) {
+    public AccountPresenter(AccountView accountview, Box<EtherAddress> addressBoxStore, EtherApi etherApi) {
         this.accountview = accountview;
         this.addressBoxStore = addressBoxStore;
-        this.address = address;
         this.etherApi = etherApi;
-        this.etherAddress = loadAddress();
-        this.transactionObserver = listenForTransactions();
     }
 
-    public void loadEtherAddress(){
-        accountview.onAddressLoad(etherAddress);
+    public void loadAddress(String address) {
+        etherAddress =  this.addressBoxStore
+                .query()
+                .equal(EtherAddress_.address, address)
+                .build()
+                .findFirst();
+        if (etherAddress != null) {
+            this.transactionObserver = listenForTransactions();
+            accountview.onAddressLoad(etherAddress);
+        }
     }
 
     public void loadLast50Transactions() {
-        transactionDisposable = etherApi.getTransactions(address, 1)
+        transactionDisposable = etherApi.getTransactions(etherAddress.getAddress(), 1)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(this::updateTransactions, accountview::addressLoadError);
@@ -58,7 +61,7 @@ public class AccountPresenter {
 
     private DataSubscription listenForTransactions() {
         return addressBoxStore.query()
-                .equal(EtherAddress_.address, address)
+                .equal(EtherAddress_.address, etherAddress.getAddress())
                 .build()
                 .subscribe()
                 .on(AndroidScheduler.mainThread())
@@ -73,14 +76,6 @@ public class AccountPresenter {
                 accountview.onTransactions(addresses.get(0).getEtherTransactions());
             }
         };
-    }
-
-    private EtherAddress loadAddress() {
-        return this.addressBoxStore
-                .query()
-                .equal(EtherAddress_.address, this.address)
-                .build()
-                .findFirst();
     }
 
     private void updateTransactions(List<EtherTransaction> transactions) {

@@ -12,7 +12,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
@@ -35,7 +35,7 @@ import io.reactivex.schedulers.Schedulers;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.verifyZeroInteractions;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
@@ -71,6 +71,7 @@ public class AccountPresenterTest {
     public void setUp(){
         address = EtherAddress.newBuilder()
                 .setBalance("1")
+                .setAddress(ETHER_ADDRESS)
                 .setEtherTransactions(toMany)
                 .build();
     }
@@ -79,7 +80,9 @@ public class AccountPresenterTest {
     public void testItListensForTransactions() throws InterruptedException {
         givenEtherAddress(this::answerOneAddress);
 
-        underTest = new AccountPresenter(accountView, etherAddressBox, ETHER_ADDRESS, etherApi);
+        underTest = new AccountPresenter(accountView, etherAddressBox, etherApi);
+
+        underTest.loadAddress(ETHER_ADDRESS);
 
         verify(accountView).onTransactions(toMany);
     }
@@ -88,16 +91,18 @@ public class AccountPresenterTest {
     public void testItDoesNotCallViewWhenNoTransactions() throws InterruptedException {
         givenEtherAddress(this::zeroAddresses);
 
-        underTest = new AccountPresenter(accountView, etherAddressBox, ETHER_ADDRESS, etherApi);
+        underTest = new AccountPresenter(accountView, etherAddressBox, etherApi);
+        underTest.loadAddress(ETHER_ADDRESS);
 
-        verifyZeroInteractions(accountView);
+        verify(accountView).onAddressLoad(address);
+        verifyNoMoreInteractions(accountView);
     }
 
     @Test
     public void testItLoadsTransactions(){
         givenEtherAddress(this::answerOneAddress);
 
-        underTest = new AccountPresenter(accountView, etherAddressBox, ETHER_ADDRESS, etherApi);
+        underTest = new AccountPresenter(accountView, etherAddressBox, etherApi);
 
         EtherTransaction eth1 = EtherTransaction.newBuilder().setHash("1").build();
         EtherTransaction eth2 = EtherTransaction.newBuilder().setHash("2").build();
@@ -106,7 +111,7 @@ public class AccountPresenterTest {
         Observable<List<EtherTransaction>> observable = Observable.just(transactions);
         when(etherApi.getTransactions(ETHER_ADDRESS, 1)).thenReturn(observable);
 
-
+        underTest.loadAddress(ETHER_ADDRESS);
         underTest.loadLast50Transactions();
 
         verify(etherAddressBox).put(address);
