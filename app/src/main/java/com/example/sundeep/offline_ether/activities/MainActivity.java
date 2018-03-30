@@ -9,7 +9,6 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
@@ -18,24 +17,24 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.example.sundeep.offline_ether.recycler.listener.AddressRecyclerItemListener;
-import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.adapters.AccountAdapter;
 import com.example.sundeep.offline_ether.adapters.BalanceSlidePagerAdapter;
-import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.mvc.presenters.CurrencySelectedPageListener;
 import com.example.sundeep.offline_ether.mvc.presenters.MainPresenter;
 import com.example.sundeep.offline_ether.mvc.views.MainView;
+import com.example.sundeep.offline_ether.recycler.listener.AddressRecyclerItemListener;
 import com.example.sundeep.offline_ether.recycler.listener.RecyclerItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import io.objectbox.Box;
+import javax.inject.Inject;
 
-public class MainActivity extends AppCompatActivity implements MainView, AddressRecyclerItemListener.OnAccountDeleteListener {
+import dagger.android.support.DaggerAppCompatActivity;
+
+public class MainActivity extends DaggerAppCompatActivity implements MainView, AddressRecyclerItemListener.OnAccountDeleteListener {
 
     private final static String TAG = "MainActivity";
     private static final int ZXING_CAMERA_PERMISSION = 1;
@@ -45,7 +44,9 @@ public class MainActivity extends AppCompatActivity implements MainView, Address
     private ViewPager balanceViewPager;
     private ImageButton nextCurrency;
     private ImageButton previousCurrency;
-    private MainPresenter mainPresenter;
+
+    @Inject MainPresenter mainPresenter;
+    @Inject BalanceSlidePagerAdapter balanceSlidePagerAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +60,6 @@ public class MainActivity extends AppCompatActivity implements MainView, Address
         nextCurrency = findViewById(R.id.next_currency_button);
         previousCurrency = findViewById(R.id.previous_currency_button);
         previousCurrency.setVisibility(View.GONE);
-        Box<EtherAddress> boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
 
         balanceViewPager.addOnPageChangeListener(new CurrencySelectedPageListener(this));
         nextCurrency.setOnClickListener(showFiatValue());
@@ -68,9 +68,6 @@ public class MainActivity extends AppCompatActivity implements MainView, Address
         setUpBalanceViewPager();
 
         setUpAddressRecyclerView();
-
-        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
-        mainPresenter = new MainPresenter(etherApi, boxStore, this);
 
         fab.setOnClickListener(view -> mainPresenter.addAccount());
     }
@@ -88,8 +85,7 @@ public class MainActivity extends AppCompatActivity implements MainView, Address
     }
 
     private void setUpBalanceViewPager() {
-        BalanceSlidePagerAdapter screenSlidePagerAdapter = new BalanceSlidePagerAdapter(getSupportFragmentManager());
-        balanceViewPager.setAdapter(screenSlidePagerAdapter);
+        balanceViewPager.setAdapter(balanceSlidePagerAdapter);
     }
 
     private void setUpAddressRecyclerView() {
@@ -184,6 +180,6 @@ public class MainActivity extends AppCompatActivity implements MainView, Address
 
     @Override
     public void onAccountDelete(EtherAddress etherAddress) {
-//        mainPresenter.deleteAccount(etherAddress);
+        mainPresenter.deleteAccount(etherAddress);
     }
 }

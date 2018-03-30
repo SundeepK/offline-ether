@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Inject;
+
 import io.objectbox.Box;
 import io.objectbox.android.AndroidScheduler;
 import io.objectbox.reactive.DataSubscription;
@@ -25,6 +27,7 @@ public class MainPresenter {
     private final MainView mainView;
     private final DataSubscription addressObserver;
 
+    @Inject
     public MainPresenter(EtherApi etherApi, Box<EtherAddress> boxStore, MainView mainView) {
         this.etherApi = etherApi;
         this.boxStore = boxStore;

@@ -21,7 +21,6 @@ import org.mockito.stubbing.Answer;
 import java.util.Collections;
 
 import io.objectbox.Box;
-import io.objectbox.Property;
 import io.objectbox.query.Query;
 import io.objectbox.query.QueryBuilder;
 import io.objectbox.reactive.DataObserver;
@@ -34,7 +33,6 @@ import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -114,11 +112,8 @@ public class MainPresenterTest {
         when(subscriptionBuilder.observer(any(DataObserver.class))).then(answers);
         when(query.subscribe()).thenReturn(subscriptionBuilder);
         when(queryBuilder.build()).thenReturn(query);
-        when(query.findFirst()).thenReturn(address);
         when(query.find()).thenReturn(Collections.singletonList(address));
         when(subscriptionBuilder.on(any())).thenReturn(subscriptionBuilder);
-        when(subscriptionBuilder.onError(any())).thenReturn(subscriptionBuilder);
-        when(queryBuilder.equal(any(Property.class), eq(ETHER_ADDRESS))).thenReturn(queryBuilder);
         when(etherAddressBox.query()).thenReturn(queryBuilder);
     }
 

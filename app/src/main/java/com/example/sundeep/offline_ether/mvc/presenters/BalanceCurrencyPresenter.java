@@ -15,6 +15,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import javax.inject.Inject;
+
 import io.objectbox.reactive.DataSubscription;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -29,6 +31,7 @@ public class BalanceCurrencyPresenter {
     private final AddressRepository addressRepository;
     private long lastUpdate = 0;
 
+    @Inject
     public BalanceCurrencyPresenter(EtherApi etherApi, AddressRepository addressRepository, BalanceView balanceView) {
         this.etherApi = etherApi;
         this.balanceView = balanceView;

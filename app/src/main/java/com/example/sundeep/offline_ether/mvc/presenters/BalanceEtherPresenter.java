@@ -7,6 +7,8 @@ import com.example.sundeep.offline_ether.utils.EtherMath;
 
 import java.util.List;
 
+import javax.inject.Inject;
+
 import io.objectbox.reactive.DataSubscription;
 
 public class BalanceEtherPresenter {
@@ -14,6 +16,7 @@ public class BalanceEtherPresenter {
     private final DataSubscription observer;
     private final BalanceEtherView balanceView;
 
+    @Inject
     public BalanceEtherPresenter(AddressRepository addressRepository, BalanceEtherView balanceView) {
         this.balanceView = balanceView;
         this.observer = addressRepository.observeAddressesChanges(this::updateBalance);
