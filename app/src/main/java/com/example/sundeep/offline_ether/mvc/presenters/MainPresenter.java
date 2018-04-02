@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import javax.inject.Inject;
+import javax.inject.Singleton;
 
 import io.objectbox.Box;
 import io.objectbox.android.AndroidScheduler;
@@ -20,6 +20,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+@Singleton
 public class MainPresenter {
 
     private final EtherApi etherApi;
@@ -27,7 +28,6 @@ public class MainPresenter {
     private final MainView mainView;
     private final DataSubscription addressObserver;
 
-    @Inject
     public MainPresenter(EtherApi etherApi, Box<EtherAddress> boxStore, MainView mainView) {
         this.etherApi = etherApi;
         this.boxStore = boxStore;

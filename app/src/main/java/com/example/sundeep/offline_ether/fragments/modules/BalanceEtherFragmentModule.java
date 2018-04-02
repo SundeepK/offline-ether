@@ -9,8 +9,8 @@ import dagger.Module;
 @Module
 public abstract class BalanceEtherFragmentModule {
 
-
     @Binds
-    abstract BalanceEtherView provideMainView(BalanceEtherFragment mainActivity);
+    public abstract BalanceEtherView provideMainView(BalanceEtherFragment mainActivity);
+
 
 }

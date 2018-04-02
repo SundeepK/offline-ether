@@ -1,8 +1,11 @@
-package com.example.sundeep.offline_ether.di;
+package com.example.sundeep.offline_ether;
 
 import android.app.Application;
 
-import com.example.sundeep.offline_ether.App;
+import com.example.sundeep.offline_ether.activities.MainActivityTest;
+import com.example.sundeep.offline_ether.di.AppModule;
+import com.example.sundeep.offline_ether.di.BoxStoreModule;
+import com.example.sundeep.offline_ether.di.ContextModule;
 
 import javax.inject.Singleton;
 
@@ -19,11 +22,14 @@ import dagger.android.support.AndroidSupportInjectionModule;
         ContextModule.class,
         BoxStoreModule.class,
         AppModule.class,
-        FragmentBuilder.class,
-        ActivityBuilder.class})
-public interface AppComponent extends AndroidInjector<DaggerApplication> {
+        TestPresentersModule.class,
+        TestFragmentBuilder.class,
+        TestActivityBuilder.class})
+public interface TestAppComponent extends AndroidInjector<DaggerApplication> {
 
-    void inject(App app);
+    void inject(TestApp testApp);
+
+    void inject(MainActivityTest mainActivityTest);
 
     @Override
     void inject(DaggerApplication instance);
@@ -32,6 +38,6 @@ public interface AppComponent extends AndroidInjector<DaggerApplication> {
     interface Builder {
         @BindsInstance
         Builder application(Application application);
-        AppComponent build();
+        TestAppComponent build();
     }
 }
