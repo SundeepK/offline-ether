@@ -9,21 +9,28 @@ import android.view.ViewGroup;
 import com.example.sundeep.offline_ether.R;
 import com.google.zxing.Result;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
+import dagger.android.AndroidInjection;
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 
 public class AddressScannerActivity extends AppCompatActivity implements ZXingScannerView.ResultHandler {
     private static final String TAG = "AddressScanner";
-    private ZXingScannerView scannerView;
+
+    @Named("addressZXingScannerView")
+    @Inject
+    ZXingScannerView scannerView;
 
     @Override
     public void onCreate(Bundle state) {
+        AndroidInjection.inject(this);
         super.onCreate(state);
         setContentView(R.layout.address_scanner);
 
         ViewGroup contentFrame = findViewById(R.id.content_frame);
-        scannerView = new ZXingScannerView(this);
         contentFrame.addView(scannerView);
     }
 
