@@ -53,6 +53,12 @@ public class AccountActivity extends AppCompatActivity implements AccountView {
     @Inject
     AccountPresenter accountPresenter;
 
+    @Inject
+    LinearLayoutManager layoutManager;
+
+    @Inject
+    DividerItemDecoration dividerItemDecoration;
+
     @Override
     public void onCreate(Bundle state) {
         AndroidInjection.inject(this);
@@ -81,10 +87,6 @@ public class AccountActivity extends AppCompatActivity implements AccountView {
     }
 
     private void initTransactionRecyclerView() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(addressRecyclerView.getContext(),
-                layoutManager.getOrientation());
-
         addressRecyclerView.addItemDecoration(dividerItemDecoration);
         addressRecyclerView.setLayoutManager(layoutManager);
         addressRecyclerView.setAdapter(transactionAdapter);

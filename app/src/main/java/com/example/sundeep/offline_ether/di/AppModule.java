@@ -4,6 +4,7 @@ import android.content.Context;
 
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
+import com.example.sundeep.offline_ether.blockies.BlockieFactory;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.objectbox.AddressRepository;
 
@@ -27,6 +28,12 @@ public class AppModule {
     public  EtherApi provideEtherApi(Context context) {
         String etherScanHost = context.getResources().getString(R.string.etherScanHost);
         return EtherApi.getEtherApi(etherScanHost);
+    }
+
+    @Singleton
+    @Provides
+    public BlockieFactory provideBlockieFactory(){
+        return new BlockieFactory();
     }
 
 }
