@@ -5,6 +5,7 @@ import com.example.sundeep.offline_ether.activities.AddressAdderActivity;
 import com.example.sundeep.offline_ether.activities.AddressScannerActivity;
 import com.example.sundeep.offline_ether.activities.MainActivity;
 import com.example.sundeep.offline_ether.activities.modules.AccountActivityModule;
+import com.example.sundeep.offline_ether.activities.modules.AccountPresenterModule;
 import com.example.sundeep.offline_ether.activities.modules.AddressAdderActivityModule;
 import com.example.sundeep.offline_ether.activities.modules.AddressAdderPresenterModule;
 import com.example.sundeep.offline_ether.activities.modules.AddressScannerModule;
@@ -24,7 +25,7 @@ public abstract class ActivityBuilder {
     abstract MainActivity bindMainActivity();
 
     @PerActivity
-    @ContributesAndroidInjector(modules = { AccountActivityModule.class })
+    @ContributesAndroidInjector(modules = { AccountActivityModule.class, AccountPresenterModule.class})
     abstract AccountActivity bindAccountActivity();
 
     @PerActivity

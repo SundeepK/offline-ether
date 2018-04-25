@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -31,11 +30,11 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import dagger.android.AndroidInjection;
+import dagger.android.support.DaggerAppCompatActivity;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 
-public class AccountActivity extends AppCompatActivity implements AccountView {
+public class AccountActivity extends DaggerAppCompatActivity implements AccountView {
 
     private final static String TAG = "AccountActivity";
 
@@ -61,9 +60,10 @@ public class AccountActivity extends AppCompatActivity implements AccountView {
 
     @Override
     public void onCreate(Bundle state) {
-        AndroidInjection.inject(this);
+//        AndroidInjection.inject(this);
         super.onCreate(state);
         setContentView(R.layout.account);
+        address = getIntent().getStringExtra(PUBLIC_ADDRESS);
 
         // views
         initViews();
@@ -78,7 +78,6 @@ public class AccountActivity extends AppCompatActivity implements AccountView {
     }
 
     private void initViews() {
-        address = getIntent().getStringExtra(PUBLIC_ADDRESS);
         addressRecyclerView = findViewById(R.id.transactions_recycler_view);
         balanceTextView = findViewById(R.id.balance);
         addressPhoto = findViewById(R.id.address_photo);

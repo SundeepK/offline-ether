@@ -2,6 +2,7 @@ package com.example.sundeep.offline_ether;
 
 import android.app.Application;
 
+import com.example.sundeep.offline_ether.activities.AccountActivityTest;
 import com.example.sundeep.offline_ether.activities.MainActivityTest;
 import com.example.sundeep.offline_ether.di.AppModule;
 import com.example.sundeep.offline_ether.di.BoxStoreModule;
@@ -30,6 +31,8 @@ public interface TestAppComponent extends AndroidInjector<DaggerApplication> {
     void inject(TestApp testApp);
 
     void inject(MainActivityTest mainActivityTest);
+
+    void inject(AccountActivityTest accountActivityTest);
 
     @Override
     void inject(DaggerApplication instance);

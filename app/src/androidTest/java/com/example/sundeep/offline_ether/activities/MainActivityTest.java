@@ -7,7 +7,6 @@ import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.runner.AndroidJUnit4;
 
-import com.example.sundeep.offline_ether.DaggerTestAppComponent;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.TestApp;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
@@ -59,7 +58,7 @@ public class MainActivityTest {
         Instrumentation instrumentation = InstrumentationRegistry.getInstrumentation();
         TestApp app
                 = (TestApp) instrumentation.getTargetContext().getApplicationContext();
-        DaggerTestAppComponent.builder().application(app).build().inject(this);
+        app.getAppComponent().inject(this);
     }
 
     @Test
