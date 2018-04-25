@@ -34,4 +34,7 @@ public interface AppComponent extends AndroidInjector<DaggerApplication> {
         Builder application(Application application);
         AppComponent build();
     }
+
+    TransactionPollerServiceComponent.Builder transactionPollerServiceBuilder();
+
 }

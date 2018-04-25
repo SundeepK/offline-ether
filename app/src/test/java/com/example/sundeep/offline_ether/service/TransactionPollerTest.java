@@ -10,7 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
@@ -85,6 +85,7 @@ public class TransactionPollerTest {
         // when
         underTest = new TransactionPoller(etherApi, etherAddressBox, cache, 1, TimeUnit.MINUTES);
         underTest.pollTransactions();
+        underTest.destroy();
 
         // then
         verify(etherAddressBox).put(address);

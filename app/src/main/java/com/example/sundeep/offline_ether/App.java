@@ -1,38 +1,42 @@
 package com.example.sundeep.offline_ether;
 
+import android.content.Intent;
+
 import com.example.sundeep.offline_ether.di.AppComponent;
 import com.example.sundeep.offline_ether.di.DaggerAppComponent;
+import com.example.sundeep.offline_ether.di.TransactionPollerServiceComponent;
+import com.example.sundeep.offline_ether.di.TransactionPollerServiceModule;
+import com.example.sundeep.offline_ether.service.TransactionPollerService;
 
 import dagger.android.AndroidInjector;
 import dagger.android.DaggerApplication;
-import io.objectbox.BoxStore;
 
 public class App extends DaggerApplication {
 
     public static final String TAG = "App";
     public static final boolean EXTERNAL_DIR = false;
 
-    private BoxStore boxStore;
+    private AppComponent appComponent;
 
     @Override
     public void onCreate() {
         super.onCreate();
+        Intent serviceIntent = new Intent(getApplicationContext(), TransactionPollerService.class);
+        String etherScanHost = getResources().getString(R.string.etherScanHost);
+        serviceIntent.putExtra("etherScanApi", etherScanHost);
+        startService(serviceIntent);
 
-//        Log.d("App", "Using ObjectBox " + BoxStore.getVersion() + " (" + BoxStore.getVersionNative() + ")");
-//        Intent serviceIntent = new Intent(getApplicationContext(), TransactionPollerService.class);
-//        String etherScanHost = getResources().getString(R.string.etherScanHost);
-//        serviceIntent.putExtra("etherScanApi", etherScanHost);
-//        startService(serviceIntent);
     }
 
     @Override
     protected AndroidInjector<? extends DaggerApplication> applicationInjector() {
-        AppComponent appComponent = DaggerAppComponent.builder().application(this).build();
+        appComponent = DaggerAppComponent.builder().application(this).build();
         appComponent.inject(this);
         return appComponent;
     }
 
-    public BoxStore getBoxStore() {
-        return boxStore;
+    public TransactionPollerServiceComponent getServiceInjector(TransactionPollerService transactionPollerService) {
+        return appComponent.transactionPollerServiceBuilder().withServiceModule(new TransactionPollerServiceModule(transactionPollerService)).build();
     }
+
 }

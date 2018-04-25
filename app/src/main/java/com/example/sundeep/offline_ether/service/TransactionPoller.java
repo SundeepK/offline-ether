@@ -17,6 +17,7 @@ import io.objectbox.Box;
 import io.objectbox.reactive.DataSubscription;
 import io.objectbox.relation.ToMany;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.functions.Function;
 
@@ -44,6 +45,7 @@ public class TransactionPoller {
     }
 
     public void pollTransactions() {
+        Log.d(TAG, "polling");
         addressQuery = boxStore.query().build()
                 .subscribe()
                 .observer(this::updateAddresses);
@@ -51,8 +53,14 @@ public class TransactionPoller {
         Collection<Observable<String>> addressesToSearch = Collections2.transform(addresses.keySet(), Observable::just);
         repeat = Observable.merge(addressesToSearch)
                 .flatMap(this::getTransactions)
-                 .repeatWhen(completed -> completed.delay(delay, timeUnit))
-                .subscribe(this::handleUpdates, this::handleError);
+                .repeatWhen(completed -> completed.delay(delay, timeUnit))
+                .retryWhen(err -> err.flatMap(this::handleRetry))
+                .subscribe(this::handleUpdates);
+    }
+
+    private ObservableSource<? extends Long> handleRetry(Throwable e) {
+        Log.e(TAG, "Error fetching transactions. Retrying polling.", e);
+        return Observable.timer(delay, timeUnit);
     }
 
     private void handleError(Throwable throwable) {
@@ -86,9 +94,7 @@ public class TransactionPoller {
 
     @NonNull
     private Function<List<EtherTransaction>, AddressToTransactions> toPair(String address) {
-        return (List<EtherTransaction> transactions) -> {
-            return new AddressToTransactions(address, transactions);
-        };
+        return (List<EtherTransaction> transactions) -> new AddressToTransactions(address, transactions);
     }
 
     private void handleUpdates(AddressToTransactions addressToTransactions) {
