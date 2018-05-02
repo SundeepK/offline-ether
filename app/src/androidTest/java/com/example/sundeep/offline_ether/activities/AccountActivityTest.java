@@ -39,6 +39,7 @@ import static org.mockito.Mockito.verify;
 public class AccountActivityTest {
 
     private static final String ADDRESS_1 = "address1";
+    private static final String ADDRESS_2 = "address2";
 
     @Inject
     AccountPresenter accountPresenter;
@@ -91,12 +92,14 @@ public class AccountActivityTest {
                 .setBlockHash("1")
                 .setBlockNumber("1")
                 .setValue("4000000000000000000")
+                .setConfirmations(1)
                 .setTimeStamp(0L)
                 .build();
         EtherTransaction ethT2 = EtherTransaction.newBuilder()
                 .setBlockHash("2")
                 .setBlockNumber("2")
                 .setValue("2200000000000000000")
+                .setConfirmations(2)
                 .setTimeStamp(1L)
                 .build();
         transactions.add(ethT1);
@@ -104,13 +107,57 @@ public class AccountActivityTest {
 
         activity.runOnUiThread(() -> activity.onTransactions(transactions));
 
+        //  item 1
         onView(withId(R.id.transactions_recycler_view))
                 .check(matches(hasDescendant(withText("4.0000 ETH"))));
         onView(withId(R.id.transactions_recycler_view))
+                .check(matches(hasDescendant(withText("Confirmations: 1"))));
+        onView(withId(R.id.transactions_recycler_view))
+                .check(matches(hasDescendant(withText("PEND"))));
+
+        // items 2
+        onView(withId(R.id.transactions_recycler_view))
                 .check(matches(hasDescendant(withText("2.2000 ETH"))));
+        onView(withId(R.id.transactions_recycler_view))
+                .check(matches(hasDescendant(withText("Confirmations: 2"))));
+        onView(withId(R.id.transactions_recycler_view))
+                .check(matches(hasDescendant(withText("PEND"))));
         RecyclerView recyclerView = activity.findViewById(R.id.transactions_recycler_view);
         assertEquals(2, recyclerView.getAdapter().getItemCount());
     }
+
+    @Test
+    public void testItLoadsShowsStatusOfTransactions() throws Exception {
+        AccountActivity activity = activityRule.getActivity();
+
+        List<EtherTransaction> transactions = new ArrayList<>();
+        EtherTransaction ethT1 = EtherTransaction.newBuilder()
+                .setFrom(ADDRESS_1)
+                .setValue("4000000000000000000")
+                .setConfirmations(20)
+                .build();
+        EtherTransaction ethT2 = EtherTransaction.newBuilder()
+                .setFrom(ADDRESS_2)
+                .setValue("2000000000000000000")
+                .setConfirmations(40)
+                .build();
+        transactions.add(ethT1);
+        transactions.add(ethT2);
+
+        activity.runOnUiThread(() -> activity.onTransactions(transactions));
+
+        //  item 1
+        onView(withId(R.id.transactions_recycler_view))
+                .check(matches(hasDescendant(withText("OUT"))));
+
+        // items 2
+        onView(withId(R.id.transactions_recycler_view))
+                .check(matches(hasDescendant(withText("IN"))));
+
+        RecyclerView recyclerView = activity.findViewById(R.id.transactions_recycler_view);
+        assertEquals(2, recyclerView.getAdapter().getItemCount());
+    }
+
 
 
 
