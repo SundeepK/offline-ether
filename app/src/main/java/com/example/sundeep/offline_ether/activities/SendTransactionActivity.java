@@ -8,26 +8,30 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.R;
-import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.SentTransaction;
 import com.example.sundeep.offline_ether.mvc.presenters.SendTransactionPresenter;
 import com.example.sundeep.offline_ether.mvc.views.SendTransactionView;
 
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjection;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 import static com.example.sundeep.offline_ether.Constants.SIGNED_TRANSACTION;
 
 public class SendTransactionActivity extends AppCompatActivity implements SendTransactionView {
 
-    private final static String TAG = "SendTransactionActivty";
+    private final static String TAG = "SendTransactionActivity";
     private ProgressBar progressBar;
     private FancyButton okButton;
     private FancyButton sendButton;
     private TextView message;
-    private SendTransactionPresenter sendTransactionPresenter;
+
+    @Inject SendTransactionPresenter sendTransactionPresenter;
 
     @Override
     public void onCreate(Bundle state) {
+        AndroidInjection.inject(this);
         super.onCreate(state);
         setContentView(R.layout.send_transaction);
 
@@ -41,9 +45,6 @@ public class SendTransactionActivity extends AppCompatActivity implements SendTr
         okButton.setVisibility(View.GONE);
 
         String transaction = getIntent().getStringExtra(SIGNED_TRANSACTION);
-        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
-
-        sendTransactionPresenter = new SendTransactionPresenter(etherApi, this);
 
         okButton.setOnClickListener(view -> SendTransactionActivity.this.finish());
         sendButton.setOnClickListener(view -> sendTransactionPresenter.sendTransaction(transaction));

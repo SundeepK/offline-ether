@@ -3,7 +3,6 @@ package com.example.sundeep.offline_ether.activities;
 import android.os.Bundle;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +15,7 @@ import com.example.sundeep.offline_ether.entities.GasPrice;
 import com.example.sundeep.offline_ether.entities.Nonce;
 import com.example.sundeep.offline_ether.fragments.GasFragment;
 
+import dagger.android.support.DaggerAppCompatActivity;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 import static com.example.sundeep.offline_ether.Constants.GAS_PRICE;
@@ -24,7 +24,7 @@ import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 import static com.example.sundeep.offline_ether.Constants.TYPE;
 import static com.example.sundeep.offline_ether.Constants.WAIT_TIME;
 
-public class OfflineTransactionActivity extends AppCompatActivity implements GasFragment.OnGasSelectedListener {
+public class OfflineTransactionActivity extends DaggerAppCompatActivity implements GasFragment.OnGasSelectedListener {
 
     private static final String TAG = "OfflineTransact";
     private ViewPager viewPager;

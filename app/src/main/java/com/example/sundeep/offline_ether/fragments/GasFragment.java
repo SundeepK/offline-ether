@@ -18,7 +18,6 @@ import android.widget.TextView;
 
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.adapters.GasPricesAdapter;
-import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.GasPrice;
 import com.example.sundeep.offline_ether.entities.Nonce;
 import com.example.sundeep.offline_ether.mvc.presenters.EthGasPresenter;
@@ -27,6 +26,10 @@ import com.example.sundeep.offline_ether.recycler.listener.RecyclerItemClickList
 
 import java.util.ArrayList;
 import java.util.List;
+
+import javax.inject.Inject;
+
+import dagger.android.support.AndroidSupportInjection;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 
@@ -39,10 +42,13 @@ public class GasFragment extends Fragment implements EthGasView {
     private int selected = -1;
     private OnGasSelectedListener onGasSelectedListener;
     private Nonce nonce = null;
-    private EthGasPresenter ethGasPresenter;
     private RecyclerView gasPricesRecyclerView;
     private TextView errorFetchingGasMessage;
     private ProgressBar gasProgressBar;
+
+    @Inject EthGasPresenter ethGasPresenter;
+    @Inject DividerItemDecoration dividerItemDecoration;
+    @Inject LinearLayoutManager layoutManager;
 
     public interface OnGasSelectedListener {
         public void onGasSelected(GasPrice gasPrice, Nonce nonce);
@@ -56,19 +62,11 @@ public class GasFragment extends Fragment implements EthGasView {
         gasPricesRecyclerView = rootView.findViewById(R.id.gas_prices_recycler_view);
         errorFetchingGasMessage = rootView.findViewById(R.id.error_gas_textview);
         gasProgressBar = rootView.findViewById(R.id.fetch_gas_progress);
-        LinearLayoutManager layoutManager = new LinearLayoutManager(getContext());
         gasPricesRecyclerView.setLayoutManager(layoutManager);
         adapter = new GasPricesAdapter(gasPrices);
         gasPricesRecyclerView.setAdapter(adapter);
-
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(gasPricesRecyclerView.getContext(),
-                layoutManager.getOrientation());
         gasPricesRecyclerView.addItemDecoration(dividerItemDecoration);
-
         gasPricesRecyclerView.addOnItemTouchListener(getGasPriceOnClick(gasPricesRecyclerView));
-
-        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
-        ethGasPresenter = new EthGasPresenter(etherApi, this);
 
         return rootView;
     }
@@ -104,6 +102,7 @@ public class GasFragment extends Fragment implements EthGasView {
 
     @Override
     public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
         super.onAttach(context);
         try {
             onGasSelectedListener = (OnGasSelectedListener) context;
