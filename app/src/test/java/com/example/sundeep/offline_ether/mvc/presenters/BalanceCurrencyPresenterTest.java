@@ -54,6 +54,7 @@ public class BalanceCurrencyPresenterTest {
 
    @Before
    public void setUp(){
+       underTest = new BalanceCurrencyPresenter(etherApi, addressRepository, balanceView);
    }
 
    @Test
@@ -67,7 +68,7 @@ public class BalanceCurrencyPresenterTest {
 
        when(addressRepository.observeAddressesChanges(any())).thenAnswer(this::answer2Addresses);
 
-       underTest = new BalanceCurrencyPresenter(etherApi, addressRepository, balanceView);
+       underTest.observeAddressChanges();
 
        verify(balanceView).onTotalBalance("£" + 80 * 3 + ".00");
    }
@@ -83,7 +84,7 @@ public class BalanceCurrencyPresenterTest {
 
         when(addressRepository.observeAddressesChanges(any())).thenAnswer(this::answer2Addresses);
 
-        underTest = new BalanceCurrencyPresenter(etherApi, addressRepository, balanceView);
+        underTest.observeAddressChanges();
 
         verify(balanceView).onTotalBalance("$" + 100 * 3 + ".00");
     }

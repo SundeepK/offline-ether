@@ -38,6 +38,7 @@ public class BalanceCurrencyFragment extends Fragment implements BalanceView {
     public void onAttach(Context context) {
         AndroidSupportInjection.inject(this);
         super.onAttach(context);
+        balanceCurrencyPresenter.observeAddressChanges();
     }
 
     @Override

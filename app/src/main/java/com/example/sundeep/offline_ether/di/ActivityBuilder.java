@@ -14,6 +14,7 @@ import com.example.sundeep.offline_ether.activities.modules.AddressScannerModule
 import com.example.sundeep.offline_ether.activities.modules.MainActivityModule;
 import com.example.sundeep.offline_ether.activities.modules.MainFragmentModule;
 import com.example.sundeep.offline_ether.activities.modules.MainPresenterModule;
+import com.example.sundeep.offline_ether.activities.modules.SendTransactionActivityModule;
 import com.example.sundeep.offline_ether.activities.modules.SendTransactionPresenterModule;
 
 import dagger.Module;
@@ -40,7 +41,7 @@ public abstract class ActivityBuilder {
     abstract AddressAdderActivity bindAddressAdderActivity();
 
     @PerActivity
-    @ContributesAndroidInjector(modules = {SendTransactionPresenterModule.class})
+    @ContributesAndroidInjector(modules = {SendTransactionPresenterModule.class, SendTransactionActivityModule.class})
     abstract SendTransactionActivity bindAddressSendTransactionActivity();
 
     @PerActivity
