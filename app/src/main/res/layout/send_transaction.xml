@@ -30,7 +30,7 @@
         android:layout_margin="10dp"
         fancy:fb_textSize="16sp"
         fancy:fb_disabledColor="#5D5D5D"
-        android:text="@string/send"
+        android:text="@string/ok"
         />
 
     <mehdi.sakout.fancybuttons.FancyButton

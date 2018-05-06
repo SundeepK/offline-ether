@@ -4,6 +4,7 @@ import com.example.sundeep.offline_ether.mvc.presenters.AccountPresenter;
 import com.example.sundeep.offline_ether.mvc.presenters.BalanceCurrencyPresenter;
 import com.example.sundeep.offline_ether.mvc.presenters.BalanceEtherPresenter;
 import com.example.sundeep.offline_ether.mvc.presenters.MainPresenter;
+import com.example.sundeep.offline_ether.mvc.presenters.SendTransactionPresenter;
 
 import org.mockito.Mockito;
 
@@ -20,6 +21,7 @@ public class TestPresentersModule {
     private MainPresenter mainPresenter = Mockito.mock(MainPresenter.class);
     private BalanceEtherPresenter balanceEtherPresenter = Mockito.mock(BalanceEtherPresenter.class);
     private BalanceCurrencyPresenter balanceCurrencyPresenter = Mockito.mock(BalanceCurrencyPresenter.class);
+    private SendTransactionPresenter sendTransactionPresenter = Mockito.mock(SendTransactionPresenter.class);
 
     @Provides
     public MainPresenter provideMainPresenter() {
@@ -39,6 +41,11 @@ public class TestPresentersModule {
     @Provides
     public AccountPresenter providesAccountPresenter(){
         return accountPresenter;
+    }
+
+    @Provides
+    public SendTransactionPresenter providesSendTransactionPresenter(){
+        return sendTransactionPresenter;
     }
 
 }

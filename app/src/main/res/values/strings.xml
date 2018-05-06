@@ -9,6 +9,7 @@
     <string name="you_haven_t_added_any_addresses_yet">You haven\'t added any addresses yet</string>
     <string name="tap_the_button_to_get_started">Tap the + button to get started</string>
     <string name="send">Send</string>
+    <string name="ok">OK</string>
     <string name="gas_price">Gas price</string>
     <string name="wait_time">Wait time</string>
     <string name="nonce">Nonce</string>
