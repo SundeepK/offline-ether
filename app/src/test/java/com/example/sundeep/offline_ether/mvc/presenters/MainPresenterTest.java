@@ -15,7 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import java.util.Collections;
@@ -77,18 +77,24 @@ public class MainPresenterTest {
 
     @Test
     public void testItListensForAddresses() throws InterruptedException {
+        // given
         givenEtherAddress(this::answerOneAddress);
 
+        // when
         underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
+        underTest.observeAddressChnage();
 
         verify(mainView).loadBalances(Collections.singletonList(address));
     }
 
     @Test
     public void testItLoadsTransactions(){
+        // given
         givenEtherAddress(this::answerOneAddress);
 
+        // when
         underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
+        underTest.observeAddressChnage();
 
         Balance balance = new Balance("add1", "2");
 

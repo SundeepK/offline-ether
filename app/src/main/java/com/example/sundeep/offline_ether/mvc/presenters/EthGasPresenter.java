@@ -27,6 +27,9 @@ public class EthGasPresenter {
     }
 
     public void loadEthGasData(String address){
+        if (subscribe != null) {
+            subscribe.dispose();
+        }
         Observable<EthGas> ethgas = etherApi.getEthgas();
         Observable<Nonce> nonce = etherApi.getNonce(address);
 

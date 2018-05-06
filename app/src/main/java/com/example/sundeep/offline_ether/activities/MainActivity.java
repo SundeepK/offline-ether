@@ -70,6 +70,7 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView, A
         setUpAddressRecyclerView();
 
         fab.setOnClickListener(view -> mainPresenter.addAccount());
+        mainPresenter.observeAddressChnage();
         mainPresenter.loadBalances();
     }
 

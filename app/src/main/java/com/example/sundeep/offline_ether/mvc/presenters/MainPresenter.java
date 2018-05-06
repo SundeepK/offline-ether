@@ -26,12 +26,18 @@ public class MainPresenter {
     private final EtherApi etherApi;
     private final Box<EtherAddress> boxStore;
     private final MainView mainView;
-    private final DataSubscription addressObserver;
+    private DataSubscription addressObserver;
 
     public MainPresenter(EtherApi etherApi, Box<EtherAddress> boxStore, MainView mainView) {
         this.etherApi = etherApi;
         this.boxStore = boxStore;
         this.mainView = mainView;
+    }
+
+    public void observeAddressChnage(){
+        if (addressObserver != null) {
+            addressObserver.cancel();
+        }
         addressObserver = observeAddressChanges();
     }
 
