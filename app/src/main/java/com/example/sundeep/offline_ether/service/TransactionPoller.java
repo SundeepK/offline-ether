@@ -50,6 +50,10 @@ public class TransactionPoller {
                 .subscribe()
                 .observer(this::updateAddresses);
 
+        addressQuery = boxStore.query().build()
+                .subscribe()
+                .observer(this::updateAddresses);
+
         Collection<Observable<String>> addressesToSearch = Collections2.transform(addresses.keySet(), Observable::just);
         repeat = Observable.merge(addressesToSearch)
                 .flatMap(this::getTransactions)
@@ -105,10 +109,14 @@ public class TransactionPoller {
             if (id != null) {
                 Log.d(TAG, "Updating transactions " + newTransactions);
                 EtherAddress etherAddress = boxStore.get(id);
-                ToMany<EtherTransaction> etherTransactions = etherAddress.getEtherTransactions();
-                etherTransactions.clear();
-                etherTransactions.addAll(newTransactions);
-                boxStore.put(etherAddress);
+                if (etherAddress == null ) {
+                    addresses.remove(address);
+                } else {
+                    ToMany<EtherTransaction> etherTransactions = etherAddress.getEtherTransactions();
+                    etherTransactions.clear();
+                    etherTransactions.addAll(newTransactions);
+                    boxStore.put(etherAddress);
+                }
             }
         }
     }

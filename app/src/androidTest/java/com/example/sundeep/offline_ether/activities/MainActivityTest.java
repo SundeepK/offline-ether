@@ -73,6 +73,35 @@ public class MainActivityTest {
     }
 
     @Test
+    public void testItRemovesAddressThrowMenu() throws Exception {
+        EtherAddress add1 = EtherAddress.newBuilder().setBlockie(new byte[0]).setAddress("1").setBalance("1").build();
+        List<EtherAddress> etherAddresses = Arrays.asList(add1);
+
+        activityRule.getActivity().runOnUiThread(() -> activityRule.getActivity().loadBalances(etherAddresses));
+        onView(withId(R.id.address_recycler_view)).check(withItemCount(1));
+
+        onView(withId(R.id.more_options)).perform(click());
+        onView(withText("Delete")).perform(click());
+
+        onView(withId(R.id.address_recycler_view)).check(withItemCount(0));
+    }
+
+    @Test
+    public void testItRemovesAddressWhenListHasMultipleAddresses() throws Exception {
+        EtherAddress add1 = EtherAddress.newBuilder().setBlockie(new byte[0]).setAddress("1").setBalance("1").build();
+        EtherAddress add2 = EtherAddress.newBuilder().setBlockie(new byte[0]).setAddress("2").setBalance("2").build();
+        EtherAddress add3 = EtherAddress.newBuilder().setBlockie(new byte[0]).setAddress("3").setBalance("3").build();
+        List<EtherAddress> etherAddresses = Arrays.asList(add1, add2, add3);
+
+        activityRule.getActivity().runOnUiThread(() -> activityRule.getActivity().loadBalances(etherAddresses));
+        onView(withId(R.id.address_recycler_view)).check(withItemCount(3));
+
+        activityRule.getActivity().runOnUiThread(() -> activityRule.getActivity().onAccountDelete(add2));
+
+        onView(withId(R.id.address_recycler_view)).check(withItemCount(2));
+    }
+
+    @Test
     public void testItShowsAddAddressActivity() throws InterruptedException {
         Intents.init();
         activityRule.getActivity().runOnUiThread(() -> activityRule.getActivity().onAddAccount());

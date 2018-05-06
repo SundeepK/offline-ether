@@ -82,7 +82,7 @@ public class MainPresenterTest {
 
         // when
         underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
-        underTest.observeAddressChnage();
+        underTest.observeAddressChange();
 
         verify(mainView).loadBalances(Collections.singletonList(address));
     }
@@ -94,7 +94,7 @@ public class MainPresenterTest {
 
         // when
         underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
-        underTest.observeAddressChnage();
+        underTest.observeAddressChange();
 
         Balance balance = new Balance("add1", "2");
 

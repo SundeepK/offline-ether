@@ -34,7 +34,7 @@ public class MainPresenter {
         this.mainView = mainView;
     }
 
-    public void observeAddressChnage(){
+    public void observeAddressChange(){
         if (addressObserver != null) {
             addressObserver.cancel();
         }

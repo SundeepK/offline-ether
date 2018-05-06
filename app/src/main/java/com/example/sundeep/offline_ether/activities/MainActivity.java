@@ -70,7 +70,7 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView, A
         setUpAddressRecyclerView();
 
         fab.setOnClickListener(view -> mainPresenter.addAccount());
-        mainPresenter.observeAddressChnage();
+        mainPresenter.observeAddressChange();
         mainPresenter.loadBalances();
     }
 
@@ -181,7 +181,12 @@ public class MainActivity extends DaggerAppCompatActivity implements MainView, A
     }
 
     @Override
-    public void onAccountDelete(EtherAddress etherAddress) {
-        mainPresenter.deleteAccount(etherAddress);
+    public void onAccountDelete(EtherAddress etherAddressDeleted) {
+        mainPresenter.deleteAccount(etherAddressDeleted);
+        int index = addressList.indexOf(etherAddressDeleted);
+        if (index > -1) {
+            addressList.remove(index);
+            adapter.notifyItemRemoved(index);
+        }
     }
 }
