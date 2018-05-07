@@ -60,7 +60,6 @@ public class AccountActivity extends DaggerAppCompatActivity implements AccountV
 
     @Override
     public void onCreate(Bundle state) {
-//        AndroidInjection.inject(this);
         super.onCreate(state);
         setContentView(R.layout.account);
         address = getIntent().getStringExtra(PUBLIC_ADDRESS);

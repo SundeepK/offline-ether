@@ -12,5 +12,6 @@
     <string name="ok">OK</string>
     <string name="gas_price">Gas price</string>
     <string name="wait_time">Wait time</string>
+    <string name="latest_transactions">Most recent transactions</string>
     <string name="nonce">Nonce</string>
 </resources>
