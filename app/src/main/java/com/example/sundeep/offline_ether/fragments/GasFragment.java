@@ -14,7 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.sundeep.offline_ether.R;
-import com.example.sundeep.offline_ether.activities.RecyclerItemClickListener;
+import com.example.sundeep.offline_ether.recycler.listener.RecyclerItemClickListener;
 import com.example.sundeep.offline_ether.adapters.GasPricesAdapter;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.EthGas;

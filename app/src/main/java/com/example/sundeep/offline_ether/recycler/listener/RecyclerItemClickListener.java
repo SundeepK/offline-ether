@@ -1,4 +1,4 @@
-package com.example.sundeep.offline_ether.activities;
+package com.example.sundeep.offline_ether.recycler.listener;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;

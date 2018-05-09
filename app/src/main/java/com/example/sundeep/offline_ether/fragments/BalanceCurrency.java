@@ -1,7 +1,6 @@
 package com.example.sundeep.offline_ether.fragments;
 
 import android.os.Bundle;
-import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -14,36 +13,17 @@ import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
-import com.example.sundeep.offline_ether.utils.EtherMath;
-
-import java.math.BigDecimal;
-import java.text.NumberFormat;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.concurrent.TimeUnit;
+import com.example.sundeep.offline_ether.mvc.presenters.BalanceCurrencyPresenter;
+import com.example.sundeep.offline_ether.mvc.views.BalanceView;
+import com.example.sundeep.offline_ether.objectbox.AddressRepository;
 
 import io.objectbox.Box;
-import io.objectbox.android.AndroidScheduler;
-import io.objectbox.query.Query;
-import io.objectbox.reactive.DataObserver;
-import io.objectbox.reactive.DataSubscription;
-import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.functions.Consumer;
-import io.reactivex.schedulers.Schedulers;
 
-public class BalanceCurrency extends Fragment {
+public class BalanceCurrency extends Fragment implements BalanceView {
 
     private static final String TAG = "BalanceCurrency";
-    private DataSubscription observer;
     private TextView balance;
-    private EtherApi etherApi;
-    private Box<EtherAddress> boxStore;
-    private long lastUpdate = 0;
-    private Map<String, String> cachedPrices = new HashMap<>();
+    private BalanceCurrencyPresenter balanceCurrencyPresenter;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -53,83 +33,36 @@ public class BalanceCurrency extends Fragment {
         balance = rootView.findViewById(R.id.balance_textView);
         balance.setText("-");
 
-        etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
+        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
+        Box<EtherAddress> boxStore = ((App) getActivity().getApplication()).getBoxStore().boxFor(EtherAddress.class);
 
-        boxStore = ((App) getActivity().getApplication()).getBoxStore().boxFor(EtherAddress.class);
+        balanceCurrencyPresenter = new BalanceCurrencyPresenter(etherApi, new AddressRepository(boxStore), this);
+
         return rootView;
-    }
-
-    private void refreshData() {
-        Query<EtherAddress> addressQuery = boxStore.query().build();
-        observer = addressQuery
-                .subscribe()
-                .on(AndroidScheduler.mainThread())
-                .observer(onAddress());
     }
 
     @Override
     public void onResume() {
         super.onResume();
-        Log.d(TAG, "ONResume");
-        refreshData();
+        Log.d(TAG, "OnResume");
+        balanceCurrencyPresenter.refreshBalances();
     }
 
     @Override
     public void onDestroy() {
         super.onDestroy();
-        observer.cancel();
+        balanceCurrencyPresenter.destroy();
     }
 
-    @NonNull
-    private DataObserver<List<EtherAddress>> onAddress() {
-        return newAddresses -> {
-            BigDecimal balanceEther = EtherMath.sumAddresses(newAddresses);
-            updateBalanceInCurrency(balanceEther);
-        };
+    @Override
+    public void onTotalBalance(String balanceInCurrency) {
+        balance.setText(balanceInCurrency);
     }
 
-    private void updateBalanceInCurrency(BigDecimal ether) {
-            getPrices()
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeOn(Schedulers.io())
-                    .subscribe(convertEtherPriceToFiat(ether), this::handlePriceQueryError);
-    }
-
-    private void handlePriceQueryError(Throwable e) {
+    @Override
+    public void onBalanceError(Throwable throwable) {
         View viewById = getActivity().findViewById(R.id.main_container);
         Snackbar.make(viewById, "Unable to fetch price updates. Check Network.", Snackbar.LENGTH_LONG).show();
-        Log.e(TAG, "Error fetching prices ", e);
+        Log.e(TAG, "Error fetching prices ", throwable);
     }
-
-    private Observable<Map<String, String>> getPrices() {
-        if(TimeUnit.SECONDS.convert(System.currentTimeMillis() - lastUpdate, TimeUnit.MILLISECONDS) > 60){
-            lastUpdate = System.currentTimeMillis();
-            return etherApi.getPrices();
-        }
-        return Observable.just(cachedPrices);
-    }
-
-    @NonNull
-    private Consumer<Map<String, String>> convertEtherPriceToFiat(BigDecimal ether) {
-        return new Consumer<Map<String, String>>() {
-            @Override
-            public void accept(Map<String, String> currToPrice) throws Exception {
-                cachedPrices.putAll(currToPrice);
-                Currency currency = Currency.getInstance(Locale.getDefault());
-                String currencyCode = currency.getCurrencyCode();
-
-                if (!currToPrice.containsKey(currencyCode)){
-                    currency = Currency.getInstance(Locale.US);
-                    currencyCode = currency.getCurrencyCode();
-                }
-
-                if (currToPrice.containsKey(currencyCode)) {
-                    NumberFormat currencyFormatter = NumberFormat.getCurrencyInstance(Locale.getDefault());
-                    balance.setText(currencyFormatter.format(ether.multiply(new BigDecimal(currToPrice.get(currencyCode)))));
-                }
-            }
-        };
-    }
-
-
 }

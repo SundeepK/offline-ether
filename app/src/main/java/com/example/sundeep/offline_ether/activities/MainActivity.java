@@ -18,7 +18,7 @@ import android.view.View;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
-import com.example.sundeep.offline_ether.AddressRecyclerItemListener;
+import com.example.sundeep.offline_ether.recycler.listener.AddressRecyclerItemListener;
 import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.adapters.AccountAdapter;
@@ -28,6 +28,7 @@ import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.mvc.presenters.CurrencySelectedPageListener;
 import com.example.sundeep.offline_ether.mvc.presenters.MainPresenter;
 import com.example.sundeep.offline_ether.mvc.views.MainView;
+import com.example.sundeep.offline_ether.recycler.listener.RecyclerItemClickListener;
 
 import java.util.ArrayList;
 import java.util.List;
