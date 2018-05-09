@@ -15,14 +15,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.invocation.InvocationOnMock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 
 import java.util.Arrays;
 import java.util.Collections;
 
 import io.objectbox.Box;
-import io.objectbox.Property;
 import io.objectbox.query.Query;
 import io.objectbox.query.QueryBuilder;
 import io.objectbox.reactive.DataObserver;
@@ -35,7 +34,6 @@ import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -82,13 +80,15 @@ public class MainPresenterTest {
                 .setAddress("add2")
                 .setEtherTransactions(toMany)
                 .build();
+
+        underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
     }
 
     @Test
     public void testItListensForAddresses() throws InterruptedException {
         givenEtherAddress(this::answerOneAddress, address);
 
-        underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
+        underTest.observeAddressChange();
 
         verify(mainView).loadBalances(Collections.singletonList(address));
     }
@@ -96,8 +96,6 @@ public class MainPresenterTest {
     @Test
     public void testItLoadsTransactions(){
         givenEtherAddress(this::answerOneAddress, address);
-
-        underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
 
         Balance balance = new Balance("add1", "2");
 
@@ -113,8 +111,6 @@ public class MainPresenterTest {
     @Test
     public void testItLoadsMultipleTransactions(){
         givenEtherAddress(this::answerTwoAddress, address, address2);
-
-        underTest = new MainPresenter(etherApi, etherAddressBox, mainView);
 
         Balance balance = new Balance("add1", "2");
         Balance balance2 = new Balance("add2", "3");
@@ -148,11 +144,8 @@ public class MainPresenterTest {
         when(subscriptionBuilder.observer(any(DataObserver.class))).then(answers);
         when(query.subscribe()).thenReturn(subscriptionBuilder);
         when(queryBuilder.build()).thenReturn(query);
-        when(query.findFirst()).thenReturn(address);
         when(query.find()).thenReturn(Arrays.asList(addresses));
         when(subscriptionBuilder.on(any())).thenReturn(subscriptionBuilder);
-        when(subscriptionBuilder.onError(any())).thenReturn(subscriptionBuilder);
-        when(queryBuilder.equal(any(Property.class), eq(ETHER_ADDRESS))).thenReturn(queryBuilder);
         when(etherAddressBox.query()).thenReturn(queryBuilder);
     }
 
