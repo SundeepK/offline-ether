@@ -57,15 +57,18 @@ public class OfflineTransactionActivity extends DaggerAppCompatActivity implemen
         offlineFlowFragmentAdapter = new OfflineFlowFragmentAdapter(getSupportFragmentManager(), address, sharedBundle);
         viewPager.setAdapter(offlineFlowFragmentAdapter);
 
-        btnNext.setEnabled(false);
+        btnNext.setText("Skip");
+        btnNext.setOnClickListener(v -> viewPager.setCurrentItem(2));
         btnBack.setOnClickListener(v -> {
-            int current = getItem(-1);
-            if (current >= 0) {
-                viewPager.setCurrentItem(current);
+            if (sharedBundle.getString(GAS_PRICE) == null) {
+                viewPager.setCurrentItem(0);
+            } else {
+                int current = getItem(-1);
+                if (current >= 0) {
+                    viewPager.setCurrentItem(current);
+                }
             }
         });
-
-        setScrollNextButton();
     }
 
     private void setScrollNextButton() {
@@ -107,6 +110,12 @@ public class OfflineTransactionActivity extends DaggerAppCompatActivity implemen
             addBottomDots(position);
             if (position == 0) {
                 btnBack.setVisibility(View.GONE);
+                btnNext.setVisibility(View.VISIBLE);
+                if (sharedBundle.getString(GAS_PRICE) == null) {
+                    btnNext.setText("Skip");
+                } else {
+                    btnNext.setText("Next");
+                }
             } else {
                 if(position == 1){
                     btnNext.setVisibility(View.VISIBLE);
@@ -136,6 +145,8 @@ public class OfflineTransactionActivity extends DaggerAppCompatActivity implemen
         sharedBundle.putFloat(WAIT_TIME, gasPrice.getWaitTime());
         sharedBundle.putString(TYPE, gasPrice.getType());
         sharedBundle.putString(NONCE, nonce.getNonce());
+        btnNext.setText("Next");
         btnNext.setEnabled(true);
+        setScrollNextButton();
     }
 }

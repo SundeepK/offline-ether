@@ -47,8 +47,6 @@ public class GasFragment extends Fragment implements EthGasView {
     private ProgressBar gasProgressBar;
 
     @Inject EthGasPresenter ethGasPresenter;
-    @Inject DividerItemDecoration dividerItemDecoration;
-    @Inject LinearLayoutManager layoutManager;
 
     public interface OnGasSelectedListener {
         public void onGasSelected(GasPrice gasPrice, Nonce nonce);
@@ -62,12 +60,12 @@ public class GasFragment extends Fragment implements EthGasView {
         gasPricesRecyclerView = rootView.findViewById(R.id.gas_prices_recycler_view);
         errorFetchingGasMessage = rootView.findViewById(R.id.error_gas_textview);
         gasProgressBar = rootView.findViewById(R.id.fetch_gas_progress);
+        LinearLayoutManager layoutManager = new LinearLayoutManager(this.getContext());
         gasPricesRecyclerView.setLayoutManager(layoutManager);
         adapter = new GasPricesAdapter(gasPrices);
         gasPricesRecyclerView.setAdapter(adapter);
-        gasPricesRecyclerView.addItemDecoration(dividerItemDecoration);
+        gasPricesRecyclerView.addItemDecoration(new DividerItemDecoration(this.getContext(), layoutManager.getOrientation()));
         gasPricesRecyclerView.addOnItemTouchListener(getGasPriceOnClick(gasPricesRecyclerView));
-
         return rootView;
     }
 
