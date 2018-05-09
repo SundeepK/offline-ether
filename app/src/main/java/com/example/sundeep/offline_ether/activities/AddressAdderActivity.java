@@ -6,16 +6,14 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 
-import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
-import com.example.sundeep.offline_ether.api.ether.EtherApi;
-import com.example.sundeep.offline_ether.blockies.BlockieFactory;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.mvc.presenters.AddressAdderPresenter;
 import com.example.sundeep.offline_ether.mvc.views.AddressAdderView;
-import com.example.sundeep.offline_ether.objectbox.AddressRepository;
 
-import io.objectbox.Box;
+import javax.inject.Inject;
+
+import dagger.android.AndroidInjection;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
@@ -27,8 +25,12 @@ public class AddressAdderActivity extends AppCompatActivity implements AddressAd
     private TextView status;
     private FancyButton okButton;
 
+    @Inject
+    AddressAdderPresenter addressAdderPresenter;
+
     @Override
     public void onCreate(Bundle state) {
+        AndroidInjection.inject(this);
         super.onCreate(state);
         setContentView(R.layout.address_adder);
 
@@ -40,15 +42,7 @@ public class AddressAdderActivity extends AppCompatActivity implements AddressAd
         String address = getIntent().getStringExtra(PUBLIC_ADDRESS);
         Log.d(TAG, "Started with" + address);
 
-        AddressAdderPresenter addressAdderPresenter = getAddressAdderPresenter();
         addressAdderPresenter.saveAddress(address);
-    }
-
-    private AddressAdderPresenter getAddressAdderPresenter() {
-        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
-        Box<EtherAddress> boxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
-        AddressRepository addressRepository = new AddressRepository(boxStore);
-        return new AddressAdderPresenter(addressRepository, this, etherApi, new BlockieFactory());
     }
 
     @Override

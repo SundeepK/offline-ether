@@ -1,6 +1,7 @@
 package com.example.sundeep.offline_ether.utils;
 
 import com.example.sundeep.offline_ether.entities.EtherAddress;
+import com.google.common.base.Strings;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,6 +17,9 @@ public class EtherMath {
     }
 
     public static String weiAsEtherStr(String wei) {
+        if (Strings.isNullOrEmpty(wei)) {
+            return "0 ETH";
+        }
         BigDecimal balance = new BigDecimal(wei);
         return balance.divide(new BigDecimal("1E18"), 4, BigDecimal.ROUND_HALF_UP).toString() + " ETH";
     }

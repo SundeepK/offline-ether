@@ -11,6 +11,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import javax.inject.Singleton;
+
 import io.objectbox.Box;
 import io.objectbox.android.AndroidScheduler;
 import io.objectbox.reactive.DataSubscription;
@@ -18,17 +20,24 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.schedulers.Schedulers;
 
+@Singleton
 public class MainPresenter {
 
     private final EtherApi etherApi;
     private final Box<EtherAddress> boxStore;
     private final MainView mainView;
-    private final DataSubscription addressObserver;
+    private DataSubscription addressObserver;
 
     public MainPresenter(EtherApi etherApi, Box<EtherAddress> boxStore, MainView mainView) {
         this.etherApi = etherApi;
         this.boxStore = boxStore;
         this.mainView = mainView;
+    }
+
+    public void observeAddressChange(){
+        if (addressObserver != null) {
+            addressObserver.cancel();
+        }
         addressObserver = observeAddressChanges();
     }
 
@@ -47,6 +56,10 @@ public class MainPresenter {
 
     public void addAccount(){
         mainView.onAddAccount();
+    }
+
+    public void deleteAccount(EtherAddress etherAddress){
+        boxStore.remove(etherAddress);
     }
 
     public Disposable loadBalances() {

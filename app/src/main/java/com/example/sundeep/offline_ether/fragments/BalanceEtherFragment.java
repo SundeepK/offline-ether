@@ -1,5 +1,6 @@
 package com.example.sundeep.offline_ether.fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -7,31 +8,33 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
-import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.mvc.presenters.BalanceEtherPresenter;
 import com.example.sundeep.offline_ether.mvc.views.BalanceEtherView;
-import com.example.sundeep.offline_ether.objectbox.AddressRepository;
 
-import io.objectbox.Box;
+import javax.inject.Inject;
 
-public class BalanceEther extends Fragment implements BalanceEtherView {
+import dagger.android.support.AndroidSupportInjection;
 
+public class BalanceEtherFragment extends Fragment implements BalanceEtherView {
+
+    @Inject
     BalanceEtherPresenter balanceEtherPresenter;
+
     private TextView balance;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-
         ViewGroup rootView = (ViewGroup) inflater.inflate(R.layout.balance, container, false);
         balance = rootView.findViewById(R.id.balance_textView);
-
-        final Box<EtherAddress> boxStore = ((App) getActivity().getApplication()).getBoxStore().boxFor(EtherAddress.class);
-        balanceEtherPresenter = new BalanceEtherPresenter(new AddressRepository(boxStore), this);
-
         return rootView;
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        AndroidSupportInjection.inject(this);
+        super.onAttach(context);
     }
 
     @Override

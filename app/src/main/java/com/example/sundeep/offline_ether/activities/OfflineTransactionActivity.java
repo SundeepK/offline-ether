@@ -3,7 +3,6 @@ package com.example.sundeep.offline_ether.activities;
 import android.os.Bundle;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.AppCompatActivity;
 import android.text.Html;
 import android.util.Log;
 import android.view.View;
@@ -16,6 +15,7 @@ import com.example.sundeep.offline_ether.entities.GasPrice;
 import com.example.sundeep.offline_ether.entities.Nonce;
 import com.example.sundeep.offline_ether.fragments.GasFragment;
 
+import dagger.android.support.DaggerAppCompatActivity;
 import mehdi.sakout.fancybuttons.FancyButton;
 
 import static com.example.sundeep.offline_ether.Constants.GAS_PRICE;
@@ -24,13 +24,13 @@ import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 import static com.example.sundeep.offline_ether.Constants.TYPE;
 import static com.example.sundeep.offline_ether.Constants.WAIT_TIME;
 
-public class OfflineTransactionActivity extends AppCompatActivity implements GasFragment.OnGasSelectedListener {
+public class OfflineTransactionActivity extends DaggerAppCompatActivity implements GasFragment.OnGasSelectedListener {
 
     private static final String TAG = "OfflineTransact";
     private ViewPager viewPager;
     private LinearLayout dotsLayout;
     private TextView[] dots;
-    private int layouts;
+    private int layouts = 3;
     private FancyButton btnBack;
     private FancyButton btnNext;
     private FragmentPagerAdapter offlineFlowFragmentAdapter;
@@ -50,8 +50,6 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
         btnNext = findViewById(R.id.btn_next);
         btnBack.setVisibility(View.GONE);
 
-        layouts = 3;
-
         // adding bottom dots
         addBottomDots(0);
 
@@ -59,20 +57,18 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
         offlineFlowFragmentAdapter = new OfflineFlowFragmentAdapter(getSupportFragmentManager(), address, sharedBundle);
         viewPager.setAdapter(offlineFlowFragmentAdapter);
 
-
-
-        btnNext.setEnabled(false);
-        btnBack.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
+        btnNext.setText("Skip");
+        btnNext.setOnClickListener(v -> viewPager.setCurrentItem(2));
+        btnBack.setOnClickListener(v -> {
+            if (sharedBundle.getString(GAS_PRICE) == null) {
+                viewPager.setCurrentItem(0);
+            } else {
                 int current = getItem(-1);
                 if (current >= 0) {
                     viewPager.setCurrentItem(current);
                 }
             }
         });
-
-        setScrollNextButton();
     }
 
     private void setScrollNextButton() {
@@ -114,6 +110,12 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
             addBottomDots(position);
             if (position == 0) {
                 btnBack.setVisibility(View.GONE);
+                btnNext.setVisibility(View.VISIBLE);
+                if (sharedBundle.getString(GAS_PRICE) == null) {
+                    btnNext.setText("Skip");
+                } else {
+                    btnNext.setText("Next");
+                }
             } else {
                 if(position == 1){
                     btnNext.setVisibility(View.VISIBLE);
@@ -143,6 +145,8 @@ public class OfflineTransactionActivity extends AppCompatActivity implements Gas
         sharedBundle.putFloat(WAIT_TIME, gasPrice.getWaitTime());
         sharedBundle.putString(TYPE, gasPrice.getType());
         sharedBundle.putString(NONCE, nonce.getNonce());
+        btnNext.setText("Next");
         btnNext.setEnabled(true);
+        setScrollNextButton();
     }
 }

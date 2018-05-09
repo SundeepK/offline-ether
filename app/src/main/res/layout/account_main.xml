@@ -38,12 +38,26 @@
         android:paddingRight="20dp"
         android:paddingTop="3dp"
         android:textColor="#666666"
-        android:textSize="12sp"
+        android:textSize="11.5sp"
         android:background="@color/colorPrimaryDark"
         android:transitionName="add_transition"
         android:layout_below="@id/balance"
         android:layout_toRightOf="@+id/address_photo"
         />
+
+    <TextView
+        android:id="@+id/recent_transactions"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
+        android:paddingLeft="20dp"
+        android:textColor="#666666"
+        android:textSize="16sp"
+        android:text="@string/latest_transactions"
+        android:layout_below="@id/address_photo"
+        />
+
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/transactions_recycler_view"
@@ -51,7 +65,7 @@
         android:layout_height="wrap_content"
         android:paddingTop="5dp"
         android:scrollbars="vertical"
-        android:layout_below="@id/address_photo"
+        android:layout_below="@id/recent_transactions"
         />
 
 </RelativeLayout>

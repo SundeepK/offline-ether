@@ -4,10 +4,14 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 
-import com.example.sundeep.offline_ether.fragments.BalanceCurrency;
-import com.example.sundeep.offline_ether.fragments.BalanceEther;
+import com.example.sundeep.offline_ether.fragments.BalanceCurrencyFragment;
+import com.example.sundeep.offline_ether.fragments.BalanceEtherFragment;
+
+import javax.inject.Inject;
 
 public class BalanceSlidePagerAdapter extends FragmentStatePagerAdapter {
+
+    @Inject
     public BalanceSlidePagerAdapter(FragmentManager fm) {
         super(fm);
     }
@@ -16,9 +20,9 @@ public class BalanceSlidePagerAdapter extends FragmentStatePagerAdapter {
     public Fragment getItem(int position) {
         switch (position) {
             case 0:
-                return new BalanceEther();
+                return new BalanceEtherFragment();
             case 1:
-                return new BalanceCurrency();
+                return new BalanceCurrencyFragment();
             case 2:
             default:
                 return null;
@@ -29,4 +33,5 @@ public class BalanceSlidePagerAdapter extends FragmentStatePagerAdapter {
     public int getCount() {
         return 2;
     }
+
 }

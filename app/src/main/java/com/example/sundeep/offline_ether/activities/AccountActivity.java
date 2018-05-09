@@ -8,7 +8,6 @@ import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -18,10 +17,8 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.example.sundeep.offline_ether.App;
 import com.example.sundeep.offline_ether.R;
 import com.example.sundeep.offline_ether.adapters.TransactionsAdapter;
-import com.example.sundeep.offline_ether.api.ether.EtherApi;
 import com.example.sundeep.offline_ether.entities.EtherAddress;
 import com.example.sundeep.offline_ether.entities.EtherTransaction;
 import com.example.sundeep.offline_ether.mvc.presenters.AccountPresenter;
@@ -31,18 +28,19 @@ import com.example.sundeep.offline_ether.utils.EtherMath;
 import java.util.ArrayList;
 import java.util.List;
 
-import io.objectbox.Box;
+import javax.inject.Inject;
+
+import dagger.android.support.DaggerAppCompatActivity;
 
 import static com.example.sundeep.offline_ether.Constants.PUBLIC_ADDRESS;
 
-public class AccountActivity extends AppCompatActivity implements AccountView {
+public class AccountActivity extends DaggerAppCompatActivity implements AccountView {
 
     private final static String TAG = "AccountActivity";
 
     private TransactionsAdapter transactionAdapter;
     private String address;
     private List<EtherTransaction> etherTransactionsList = new ArrayList<>();
-    private AccountPresenter accountPresenter;
 
     // views
     private RecyclerView addressRecyclerView;
@@ -51,26 +49,34 @@ public class AccountActivity extends AppCompatActivity implements AccountView {
     private TextView addressTextView;
     private FloatingActionButton fab;
 
+    @Inject
+    AccountPresenter accountPresenter;
+
+    @Inject
+    LinearLayoutManager layoutManager;
+
+    @Inject
+    DividerItemDecoration dividerItemDecoration;
+
     @Override
     public void onCreate(Bundle state) {
         super.onCreate(state);
         setContentView(R.layout.account);
+        address = getIntent().getStringExtra(PUBLIC_ADDRESS);
 
         // views
         initViews();
 
         transactionAdapter = getTransactionAdapter();
-        accountPresenter = getAccountPresenter();
 
         initTransactionRecyclerView();
 
         fab.setOnClickListener(startOfflineTransaction(address));
 
-        accountPresenter.loadEtherAddress();
+        accountPresenter.loadAddress(address);
     }
 
     private void initViews() {
-        address = getIntent().getStringExtra(PUBLIC_ADDRESS);
         addressRecyclerView = findViewById(R.id.transactions_recycler_view);
         balanceTextView = findViewById(R.id.balance);
         addressPhoto = findViewById(R.id.address_photo);
@@ -79,10 +85,6 @@ public class AccountActivity extends AppCompatActivity implements AccountView {
     }
 
     private void initTransactionRecyclerView() {
-        LinearLayoutManager layoutManager = new LinearLayoutManager(this);
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(addressRecyclerView.getContext(),
-                layoutManager.getOrientation());
-
         addressRecyclerView.addItemDecoration(dividerItemDecoration);
         addressRecyclerView.setLayoutManager(layoutManager);
         addressRecyclerView.setAdapter(transactionAdapter);
@@ -92,12 +94,6 @@ public class AccountActivity extends AppCompatActivity implements AccountView {
         int paddingPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
         return new TransactionsAdapter(etherTransactionsList, address, drawable(R.drawable.orange_rounded_corner),
                 drawable(R.drawable.green_rounded_corner), drawable(R.drawable.dark_rounded_corner), paddingPx);
-    }
-
-    private AccountPresenter getAccountPresenter() {
-        EtherApi etherApi = EtherApi.getEtherApi(getResources().getString(R.string.etherScanHost));
-        Box<EtherAddress> addressBoxStore = ((App) getApplication()).getBoxStore().boxFor(EtherAddress.class);
-        return new AccountPresenter(this, addressBoxStore, address, etherApi);
     }
 
     private Drawable drawable(int drawable) {
@@ -150,4 +146,5 @@ public class AccountActivity extends AppCompatActivity implements AccountView {
         balanceTextView.setText(EtherMath.weiAsEtherStr(address.getBalance()));
         onTransactions(address.getEtherTransactions());
     }
+
 }

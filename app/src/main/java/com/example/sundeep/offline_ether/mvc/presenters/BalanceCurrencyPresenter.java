@@ -22,7 +22,7 @@ import io.reactivex.schedulers.Schedulers;
 
 public class BalanceCurrencyPresenter {
 
-    private final DataSubscription observer;
+    private DataSubscription observer;
     private final EtherApi etherApi;
     private final Map<String, String> cachedPrices = new HashMap<>();
     private final BalanceView balanceView;
@@ -33,6 +33,12 @@ public class BalanceCurrencyPresenter {
         this.etherApi = etherApi;
         this.balanceView = balanceView;
         this.addressRepository = addressRepository;
+    }
+
+    public void observeAddressChanges(){
+        if (observer != null) {
+            observer.cancel();
+        }
         this.observer = addressRepository.observeAddressesChanges(this::updateBalance);
     }
 
