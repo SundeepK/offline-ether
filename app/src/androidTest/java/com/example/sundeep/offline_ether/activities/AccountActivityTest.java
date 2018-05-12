@@ -1,7 +1,6 @@
 package com.example.sundeep.offline_ether.activities;
 
 import android.app.Instrumentation;
-import android.content.Context;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
@@ -49,8 +48,6 @@ public class AccountActivityTest {
             new ActivityTestRule<AccountActivity>(AccountActivity.class) {
                 @Override
                 protected Intent getActivityIntent() {
-                    Context targetContext = InstrumentationRegistry.getInstrumentation()
-                            .getTargetContext();
                     Intent result = new Intent();
                     result.putExtra(PUBLIC_ADDRESS, ADDRESS_1);
                     return result;
@@ -158,7 +155,28 @@ public class AccountActivityTest {
         assertEquals(2, recyclerView.getAdapter().getItemCount());
     }
 
+    @Test
+    public void testItShowsTransactionsToSelf() throws Exception {
+        AccountActivity activity = activityRule.getActivity();
 
+        List<EtherTransaction> transactions = new ArrayList<>();
+        EtherTransaction ethT1 = EtherTransaction.newBuilder()
+                .setFrom(ADDRESS_1)
+                .setTo(ADDRESS_1)
+                .setValue("4000000000000000000")
+                .setConfirmations(20)
+                .build();
+        transactions.add(ethT1);
+
+        activity.runOnUiThread(() -> activity.onTransactions(transactions));
+
+        //  item 1
+        onView(withId(R.id.transactions_recycler_view))
+                .check(matches(hasDescendant(withText("SELF"))));
+
+        RecyclerView recyclerView = activity.findViewById(R.id.transactions_recycler_view);
+        assertEquals(1, recyclerView.getAdapter().getItemCount());
+    }
 
 
 }

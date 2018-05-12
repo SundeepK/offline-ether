@@ -9,6 +9,7 @@ import com.example.sundeep.offline_ether.entities.EtherTransaction;
 import com.google.common.collect.Collections2;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
@@ -54,7 +55,7 @@ public class TransactionPoller {
                 .subscribe()
                 .observer(this::updateAddresses);
 
-        Collection<Observable<String>> addressesToSearch = Collections2.transform(addresses.keySet(), Observable::just);
+        Collection<Observable<String>> addressesToSearch = Collections2.transform(new HashSet<>(addresses.keySet()), Observable::just);
         repeat = Observable.merge(addressesToSearch)
                 .flatMap(this::getTransactions)
                 .repeatWhen(completed -> completed.delay(delay, timeUnit))

@@ -33,7 +33,7 @@ public class TransactionPollerServiceModule {
     public TransactionPoller providesTransactionPoller(EtherApi etherApi, BoxStore boxStore){
         Log.d("TransactionPollerServiceModule", "creating TransactionPoller");
         return new TransactionPoller(etherApi, boxStore.boxFor(EtherAddress.class),
-                new ConcurrentHashMap<>(), 30,  TimeUnit.SECONDS);
+                new ConcurrentHashMap<>(), 15,  TimeUnit.SECONDS);
     }
 
 }

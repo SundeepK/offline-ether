@@ -19,10 +19,11 @@ import java.util.List;
 
 public class TransactionsAdapter extends RecyclerView.Adapter<TransactionsAdapter.EtherTransactionViewHolder> {
 
-    private final static String TAG  = "TransactionsAdapter";
+    private final static String TAG = "TransactionsAdapter";
     private final Drawable outOrange;
     private final Drawable inDrawable;
     private final Drawable loadingDrawable;
+    private final Drawable blueDrawable;
     private final int padding;
     private final String address;
     private final List<EtherTransaction> etherTransactions;
@@ -30,12 +31,13 @@ public class TransactionsAdapter extends RecyclerView.Adapter<TransactionsAdapte
 
     public TransactionsAdapter(List<EtherTransaction> etherTransactions, String address,
                                Drawable outDrawable, Drawable inDrawable,
-                               Drawable loadingDrawable, int padding){
+                               Drawable loadingDrawable, Drawable blueDrawable, int padding) {
         this.etherTransactions = etherTransactions;
         this.address = address;
         this.outOrange = outDrawable;
         this.inDrawable = inDrawable;
         this.loadingDrawable = loadingDrawable;
+        this.blueDrawable = blueDrawable;
         this.padding = padding;
     }
 
@@ -68,7 +70,11 @@ public class TransactionsAdapter extends RecyclerView.Adapter<TransactionsAdapte
             viewHolder.inOrOut.setBackground(loadingDrawable);
             viewHolder.shimmer.startShimmerAnimation();
         } else {
-            if (etherTransaction.getFrom().equalsIgnoreCase(address)) {
+            if (etherTransaction.getFrom().equalsIgnoreCase(address) &&
+                    etherTransaction.getTo().equalsIgnoreCase(address)) {
+                viewHolder.inOrOut.setBackground(blueDrawable);
+                viewHolder.inOrOut.setText("SELF");
+            } else if (etherTransaction.getFrom().equalsIgnoreCase(address)) {
                 viewHolder.inOrOut.setBackground(outOrange);
                 viewHolder.inOrOut.setText("OUT");
             } else {

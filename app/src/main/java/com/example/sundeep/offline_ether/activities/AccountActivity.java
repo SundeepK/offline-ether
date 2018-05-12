@@ -93,7 +93,7 @@ public class AccountActivity extends DaggerAppCompatActivity implements AccountV
     private TransactionsAdapter getTransactionAdapter() {
         int paddingPx = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 8, getResources().getDisplayMetrics());
         return new TransactionsAdapter(etherTransactionsList, address, drawable(R.drawable.orange_rounded_corner),
-                drawable(R.drawable.green_rounded_corner), drawable(R.drawable.dark_rounded_corner), paddingPx);
+                drawable(R.drawable.green_rounded_corner), drawable(R.drawable.dark_rounded_corner), drawable(R.drawable.blue_rounded_corner), paddingPx);
     }
 
     private Drawable drawable(int drawable) {

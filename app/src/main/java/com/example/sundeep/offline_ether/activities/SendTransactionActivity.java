@@ -70,6 +70,7 @@ public class SendTransactionActivity extends AppCompatActivity implements SendTr
             sendButton.setText("Retry");
             sendButton.setVisibility(View.VISIBLE);
             message.setText("Error occurred sending transaction. \n" + sentTransaction.getError().getMessage());
+            Log.e(TAG, "Failed sending transactions " + sentTransaction.getError());
         } else {
             okButton.setVisibility(View.VISIBLE);
             message.setText("Transaction successfully sent.");
