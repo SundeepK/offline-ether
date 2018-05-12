@@ -3,6 +3,7 @@ package com.example.sundeep.offline_ether;
 import com.example.sundeep.offline_ether.mvc.presenters.AccountPresenter;
 import com.example.sundeep.offline_ether.mvc.presenters.BalanceCurrencyPresenter;
 import com.example.sundeep.offline_ether.mvc.presenters.BalanceEtherPresenter;
+import com.example.sundeep.offline_ether.mvc.presenters.EthGasPresenter;
 import com.example.sundeep.offline_ether.mvc.presenters.MainPresenter;
 import com.example.sundeep.offline_ether.mvc.presenters.SendTransactionPresenter;
 
@@ -22,6 +23,7 @@ public class TestPresentersModule {
     private BalanceEtherPresenter balanceEtherPresenter = Mockito.mock(BalanceEtherPresenter.class);
     private BalanceCurrencyPresenter balanceCurrencyPresenter = Mockito.mock(BalanceCurrencyPresenter.class);
     private SendTransactionPresenter sendTransactionPresenter = Mockito.mock(SendTransactionPresenter.class);
+    private EthGasPresenter ethGasPresenter = Mockito.mock(EthGasPresenter.class);
 
     @Provides
     public MainPresenter provideMainPresenter() {
@@ -46,6 +48,11 @@ public class TestPresentersModule {
     @Provides
     public SendTransactionPresenter providesSendTransactionPresenter(){
         return sendTransactionPresenter;
+    }
+
+    @Provides
+    public EthGasPresenter providesEthGasPresenter(){
+        return ethGasPresenter;
     }
 
 }

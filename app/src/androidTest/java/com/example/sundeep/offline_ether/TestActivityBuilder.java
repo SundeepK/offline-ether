@@ -3,6 +3,7 @@ package com.example.sundeep.offline_ether;
 import com.example.sundeep.offline_ether.activities.AccountActivity;
 import com.example.sundeep.offline_ether.activities.AddressScannerActivity;
 import com.example.sundeep.offline_ether.activities.MainActivity;
+import com.example.sundeep.offline_ether.activities.OfflineTransactionActivity;
 import com.example.sundeep.offline_ether.activities.SendTransactionActivity;
 import com.example.sundeep.offline_ether.activities.modules.AccountActivityModule;
 import com.example.sundeep.offline_ether.activities.modules.AddressScannerModule;
@@ -33,5 +34,9 @@ public abstract class TestActivityBuilder {
     @PerActivity
     @ContributesAndroidInjector(modules = { SendTransactionActivityModule.class })
     abstract SendTransactionActivity bindSendTransactionActivity();
+
+    @PerActivity
+    @ContributesAndroidInjector()
+    abstract OfflineTransactionActivity bindOfflineTransactionActivity();
 
 }

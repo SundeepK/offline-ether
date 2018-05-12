@@ -4,6 +4,7 @@ import android.app.Application;
 
 import com.example.sundeep.offline_ether.activities.AccountActivityTest;
 import com.example.sundeep.offline_ether.activities.MainActivityTest;
+import com.example.sundeep.offline_ether.activities.OfflineTransactionActivityTest;
 import com.example.sundeep.offline_ether.activities.SendTransactionActivityTest;
 import com.example.sundeep.offline_ether.di.AppModule;
 import com.example.sundeep.offline_ether.di.BoxStoreModule;
@@ -34,6 +35,8 @@ public interface TestAppComponent extends AndroidInjector<DaggerApplication> {
     void inject(MainActivityTest mainActivityTest);
 
     void inject(AccountActivityTest accountActivityTest);
+
+    void inject(OfflineTransactionActivityTest offlineTransactionActivityTest);
 
     void inject(SendTransactionActivityTest sendTransactionActivityTest);
 

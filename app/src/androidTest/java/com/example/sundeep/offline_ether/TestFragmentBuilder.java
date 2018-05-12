@@ -3,8 +3,10 @@ package com.example.sundeep.offline_ether;
 import com.example.sundeep.offline_ether.di.PerChildFragment;
 import com.example.sundeep.offline_ether.fragments.BalanceCurrencyFragment;
 import com.example.sundeep.offline_ether.fragments.BalanceEtherFragment;
+import com.example.sundeep.offline_ether.fragments.GasFragment;
 import com.example.sundeep.offline_ether.fragments.modules.BalanceCurrencyFragmentModule;
 import com.example.sundeep.offline_ether.fragments.modules.BalanceEtherFragmentModule;
+import com.example.sundeep.offline_ether.fragments.modules.EthGasFragmentModule;
 
 import dagger.Module;
 import dagger.android.ContributesAndroidInjector;
@@ -20,5 +22,9 @@ public abstract class TestFragmentBuilder {
     @PerChildFragment
     @ContributesAndroidInjector(modules = {BalanceCurrencyFragmentModule.class, TestPresentersModule.class})
     abstract BalanceCurrencyFragment balanceCurrencyFragmentInjector();
+
+    @PerChildFragment
+    @ContributesAndroidInjector(modules = {EthGasFragmentModule.class, TestPresentersModule.class})
+    abstract GasFragment GasFragmentInjector();
 
 }

@@ -12,7 +12,7 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:textColor="#FBFBFB"
-        android:text="Step 2 Sign transaction/"
+        android:text="@string/step_2_sign_transaction"
         android:textStyle="bold" />
 
     <TextView
