@@ -9,11 +9,17 @@ buildscript {
     }
 
 }
-
 apply plugin: 'com.android.application'
 apply plugin: 'io.objectbox'
-
 android {
+    signingConfigs {
+        config {
+            keyAlias 'key0'
+            keyPassword 'offlinemetal111'
+            storeFile file('/home/sundeep/offlineether_real.jks')
+            storePassword 'offlinemetal111'
+        }
+    }
     compileSdkVersion 26
     defaultConfig {
         applicationId "com.example.sundeep.offline_ether"
@@ -28,16 +34,15 @@ android {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
             resValue 'string', 'etherScanHost', '"api.etherscan.io"'
+            signingConfig signingConfigs.config
         }
         debug {
             resValue 'string', 'etherScanHost', '"rinkeby.etherscan.io"'
         }
     }
-
     testOptions {
         unitTests.returnDefaultValues = true
     }
-
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
@@ -88,10 +93,13 @@ android {
 
         }
     }
+    productFlavors {
+    }
 }
-
 android.applicationVariants.all {
     def aptOutputDir = new File(buildDir, "generated/source/apt/${it.unitTestVariant.dirName}")
     it.unitTestVariant.addJavaSourceFoldersToModel(aptOutputDir)
 }
 
+dependencies {
+}
