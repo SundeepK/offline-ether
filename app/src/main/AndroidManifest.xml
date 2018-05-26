@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.example.sundeep.offline_ether">
+    package="com.github.sundeepk.offline.ether">
     <uses-feature android:name="android.hardware.camera2.full" />
     <uses-permission android:name="android.permission.CAMERA" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -13,17 +13,17 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:name=".App"
+        android:name="com.github.sundeepk.offline.ether.App"
         android:theme="@style/AppTheme">
-        <service android:name=".service.TransactionPollerService" android:exported="false"/>
-        <activity android:label="New Address" android:name=".activities.AddressScannerActivity"/>
-        <activity android:label="New Address" android:name=".activities.AddressAdderActivity"/>
-        <activity android:label="Account" android:name=".activities.AccountActivity"/>
-        <activity android:label="Offline" android:name=".activities.OfflineTransactionActivity"/>
-        <activity android:label="Send transaction" android:name=".activities.SendTransactionActivity"/>
-        <activity android:label="Scan transaction" android:name=".activities.TransactionScannerActivity"/>
+        <service android:name="com.github.sundeepk.offline.ether.service.TransactionPollerService" android:exported="false"/>
+        <activity android:label="New Address" android:name="com.github.sundeepk.offline.ether.activities.AddressScannerActivity"/>
+        <activity android:label="New Address" android:name="com.github.sundeepk.offline.ether.activities.AddressAdderActivity"/>
+        <activity android:label="Account" android:name="com.github.sundeepk.offline.ether.activities.AccountActivity"/>
+        <activity android:label="Offline" android:name="com.github.sundeepk.offline.ether.activities.OfflineTransactionActivity"/>
+        <activity android:label="Send transaction" android:name="com.github.sundeepk.offline.ether.activities.SendTransactionActivity"/>
+        <activity android:label="Scan transaction" android:name="com.github.sundeepk.offline.ether.activities.TransactionScannerActivity"/>
         <activity
-            android:name=".activities.MainActivity"
+            android:name="com.github.sundeepk.offline.ether.activities.MainActivity"
             android:label="@string/app_name">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

@@ -22,12 +22,12 @@ android {
     }
     compileSdkVersion 26
     defaultConfig {
-        applicationId "com.example.sundeep.offline_ether"
+        applicationId "com.github.sundeepk.offline.ether"
         minSdkVersion 19
         targetSdkVersion 26
         versionCode 1
         versionName "1.0"
-        testInstrumentationRunner "com.example.sundeep.offline_ether.TestRunner"
+        testInstrumentationRunner "com.github.sundeepk.offline.ether.TestRunner"
     }
     buildTypes {
         release {

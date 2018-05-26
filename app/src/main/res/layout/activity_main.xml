@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#292929"
-    tools:context="com.example.sundeep.offline_ether.activities.MainActivity">
+    tools:context="com.github.sundeepk.offline.ether.activities.MainActivity">
 
     <include layout="@layout/content_main" />
 

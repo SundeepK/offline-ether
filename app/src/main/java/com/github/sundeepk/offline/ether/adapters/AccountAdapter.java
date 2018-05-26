@@ -1,0 +1,75 @@
+package com.github.sundeepk.offline.ether.adapters;
+
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.support.v7.widget.RecyclerView;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
+
+import com.github.sundeepk.offline.ether.R;
+import com.github.sundeepk.offline.ether.entities.EtherAddress;
+import com.github.sundeepk.offline.ether.utils.EtherMath;
+
+import java.util.List;
+
+public class AccountAdapter extends RecyclerView.Adapter<AccountAdapter.EtherAddressViewHolder>{
+
+    private final List<EtherAddress> etherAddresses;
+    private final static String TAG  = "AddressAdapter";
+
+    public AccountAdapter(List<EtherAddress> etherAddresses){
+        this.etherAddresses = etherAddresses;
+    }
+
+    @Override
+    public int getItemCount() {
+        return etherAddresses.size();
+    }
+
+    @Override
+    public EtherAddressViewHolder onCreateViewHolder(ViewGroup viewGroup, int i) {
+        Log.d(TAG, "onCreateViewHolder: " + i);
+
+        View v = LayoutInflater.from(viewGroup.getContext()).inflate(R.layout.address_item, viewGroup, false);
+        EtherAddressViewHolder pvh = new EtherAddressViewHolder(v);
+        return pvh;
+    }
+
+    @Override
+    public void onAttachedToRecyclerView(RecyclerView recyclerView) {
+        super.onAttachedToRecyclerView(recyclerView);
+    }
+
+    @Override
+    public void onBindViewHolder(EtherAddressViewHolder viewHolder, int i) {
+        Log.d(TAG, "render: " + i);
+        EtherAddress etherAddress = etherAddresses.get(i);
+        viewHolder.address.setText(etherAddress.getAddress());
+        viewHolder.balance.setText(EtherMath.weiAsEtherStr(etherAddress.getBalance()));
+        byte[] blockie = etherAddress.getBlockie();
+        Bitmap bitmap = BitmapFactory.decodeByteArray(blockie, 0, blockie.length);
+        viewHolder.addressPhoto.setImageBitmap(bitmap);
+    }
+
+    public static class EtherAddressViewHolder extends RecyclerView.ViewHolder {
+        TextView address;
+        TextView lastTransaction;
+        TextView balance;
+        ImageView addressPhoto;
+        ImageView moreOptions;
+
+        EtherAddressViewHolder(View itemView) {
+            super(itemView);
+            address = (TextView)itemView.findViewById(R.id.address);
+            lastTransaction = (TextView)itemView.findViewById(R.id.last_transaction);
+            balance = (TextView)itemView.findViewById(R.id.balance);
+            addressPhoto = (ImageView)itemView.findViewById(R.id.address_photo);
+            moreOptions = (ImageView)itemView.findViewById(R.id.more_options);
+        }
+    }
+
+}
