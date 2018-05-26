@@ -21,6 +21,6 @@ public class ExampleInstrumentedTest {
         // Context of the app under test.
         Context appContext = InstrumentationRegistry.getTargetContext();
 
-        assertEquals("com.example.sundeep.offline_ether", appContext.getPackageName());
+        assertEquals("com.github.sundeepk.offline.ether", appContext.getPackageName());
     }
 }
