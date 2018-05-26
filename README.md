@@ -13,10 +13,9 @@ UI test (connect device first)
 
 App which allows users to sign transactions from an air gap computer. It works by allowing users to use the camera to scan a QR code and broadcasts transactions automatically. You can also add addresses and view recent transactions as well as monitor pending transactions.
 
-![ScreenShot](https://github.com/SundeepK/offline-ether/blob/master/screenshots/device-2018-05-26-225653-small.png)
+<img src="https://github.com/SundeepK/offline-ether/blob/master/screenshots/device-2018-05-26-225653-small.png" width="300" height="600">
+<img src="https://github.com/SundeepK/offline-ether/blob/master/screenshots/device-2018-05-26-225732-small.png" width="300" height="600">
+<img src="https://github.com/SundeepK/offline-ether/blob/master/screenshots/device-2018-05-26-225815-small.png" width="300" height="600">
 
-![ScreenShot](https://github.com/SundeepK/offline-ether/blob/master/screenshots/device-2018-05-26-225732-small.png)
-
-![ScreenShot](https://github.com/SundeepK/offline-ether/blob/master/screenshots/device-2018-05-26-225815-small.png)
 
 
