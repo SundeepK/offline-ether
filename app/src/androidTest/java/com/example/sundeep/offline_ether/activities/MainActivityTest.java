@@ -1,10 +1,12 @@
 package com.example.sundeep.offline_ether.activities;
 
+import android.Manifest;
 import android.app.Instrumentation;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.espresso.intent.Intents;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.example.sundeep.offline_ether.R;
@@ -52,6 +54,9 @@ public class MainActivityTest {
 
     @Rule
     public ActivityTestRule<MainActivity> activityRule = new ActivityTestRule<>(MainActivity.class, true, true);
+
+    @Rule
+    public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA);
 
     @Before
     public void setUp(){

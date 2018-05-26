@@ -1,10 +1,12 @@
 package com.example.sundeep.offline_ether.activities;
 
+import android.Manifest;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 
 import com.example.sundeep.offline_ether.R;
@@ -39,6 +41,7 @@ public class SendTransactionActivityTest {
 
     @Inject
     SendTransactionPresenter sendTransactionPresenter;
+    @Rule public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA);
 
     @Rule
     public ActivityTestRule<SendTransactionActivity> activityRule =

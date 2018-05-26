@@ -1,10 +1,12 @@
 package com.example.sundeep.offline_ether.activities;
 
+import android.Manifest;
 import android.app.Instrumentation;
 import android.content.Intent;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.filters.LargeTest;
 import android.support.test.rule.ActivityTestRule;
+import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
 import android.support.v7.widget.RecyclerView;
 
@@ -42,6 +44,7 @@ public class AccountActivityTest {
 
     @Inject
     AccountPresenter accountPresenter;
+    @Rule public GrantPermissionRule permissionRule = GrantPermissionRule.grant(Manifest.permission.CAMERA);
 
     @Rule
     public ActivityTestRule<AccountActivity> activityRule =
@@ -131,11 +134,13 @@ public class AccountActivityTest {
         EtherTransaction ethT1 = EtherTransaction.newBuilder()
                 .setFrom(ADDRESS_1)
                 .setValue("4000000000000000000")
+                .setTo(ADDRESS_2)
                 .setConfirmations(20)
                 .build();
         EtherTransaction ethT2 = EtherTransaction.newBuilder()
                 .setFrom(ADDRESS_2)
                 .setValue("2000000000000000000")
+                .setTo(ADDRESS_1)
                 .setConfirmations(40)
                 .build();
         transactions.add(ethT1);
